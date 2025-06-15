@@ -1,0 +1,49 @@
+{
+    "name": "your-backend-app-name",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "@google-cloud/storage": "^7.15.0",
+        "@tensorflow-models/qna": "^1.0.2",
+        "@tensorflow/tfjs": "^4.22.0",
+        "archiver": "^7.0.1",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "exceljs": "^4.4.0",
+        "express": "^4.21.2",
+        "express-async-handler": "^1.2.0",
+        "express-rate-limit": "^7.5.0",
+        "express-validator": "^7.2.1",
+        "extract-zip": "^2.0.1",
+        "handlebars": "^4.7.8",
+        "haversine-distance": "^1.2.3",
+        "helmet": "^8.0.0",
+        "joi": "^17.13.3",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.10.0",
+        "multer": "^1.4.5-lts.1",
+        "node-cache": "^5.1.2",
+        "nodemailer": "^6.9.16",
+        "pdf-merger-js": "^5.1.2",
+        "pdfkit": "^0.16.0",
+        "puppeteer": "^21.11.0",
+        "qrcode": "^1.5.4",
+        "socket.io": "^4.8.1",
+        "speakeasy": "^2.0.0",
+        "web-push": "^3.6.7"
+    },
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "nodemon src/app.js",
+        "seed": "node src/utils/seedData.js"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.9"
+    },
+    "main": "index.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": ""
+}

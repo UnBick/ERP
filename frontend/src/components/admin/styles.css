@@ -1,0 +1,38 @@
+/* Update chart colors for light theme */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+    stroke: #e0e0e0;
+}
+
+.recharts-text {
+    fill: #333333;
+}
+
+.recharts-legend-item-text {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+}
+
+.recharts-default-tooltip {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    border: none !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.recharts-tooltip-label {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 4px !important;
+}
+
+.recharts-tooltip-item {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+    font-size: 0.75rem !important;
+}
+
+/* Add or update other styles as needed */

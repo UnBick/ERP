@@ -1,0 +1,85 @@
+.syllabus-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.syllabus-page h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 3rem;
+  font-size: 2.5rem;
+}
+
+.class-selector {
+  margin-bottom: 3rem;
+}
+
+.class-groups {
+  display: grid;
+  gap: 2rem;
+}
+
+.class-group {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.class-group h3 {
+  color: #3498db;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.class-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.class-buttons button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  background: #f5f6fa;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.class-buttons button.active {
+  background: #3498db;
+  color: white;
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+.syllabus-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .syllabus-page {
+    padding: 2rem 1rem;
+  }
+
+  .class-group {
+    padding: 1.5rem;
+  }
+
+  .class-buttons button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+} 

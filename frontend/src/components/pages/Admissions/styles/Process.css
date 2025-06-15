@@ -1,0 +1,60 @@
+.admission-process {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.admission-process h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 4rem;
+  font-size: 2.5rem;
+}
+
+.process-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+  padding: 2rem;
+}
+
+.process-step {
+  text-align: center;
+  position: relative;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  background: #3498db;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+  font-size: 2rem;
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+.process-step h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.process-step p {
+  color: #666;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .admission-process {
+    padding: 2rem 1rem;
+  }
+
+  .process-timeline {
+    gap: 2rem;
+    padding: 1rem;
+  }
+} 

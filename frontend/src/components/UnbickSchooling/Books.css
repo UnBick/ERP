@@ -1,0 +1,25 @@
+/* frontend/src/components/UnbickSchooling/Books.css */
+.books-container {
+    padding: 20px;
+  }
+  
+  .eye-protect {
+    background-color: #f5deb3; /* Eye protection background color */
+  }
+  
+  .pdf-list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .pdf-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+  }
+  
+  .pdf-viewer {
+    margin-top: 20px;
+  }

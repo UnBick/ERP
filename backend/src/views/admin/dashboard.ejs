@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('../partials/header') %>
+        <main class="dashboard-content">
+            <h1>Welcome, <%= admin.username %></h1>
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <h3>Total Students</h3>
+                    <p><%= stats.totalStudents %></p>
+                </div>
+                <!-- More stat cards -->
+            </div>
+            <div class="recent-activities">
+                <!-- Activities list -->
+            </div>
+        </main>
+    </div>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

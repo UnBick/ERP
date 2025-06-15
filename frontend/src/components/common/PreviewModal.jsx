@@ -1,0 +1,24 @@
+import React from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+
+const PreviewModal = ({ open, onClose, title, children }) => {
+  return (
+    <Dialog 
+      open={open} 
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      className="preview-modal"
+    >
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        {children}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Close</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default PreviewModal;

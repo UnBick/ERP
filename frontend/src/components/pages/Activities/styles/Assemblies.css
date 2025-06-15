@@ -1,0 +1,148 @@
+.assemblies-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.assemblies-page h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 3rem;
+  font-size: 2.5rem;
+}
+
+.filter-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.filter-controls button {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 30px;
+  background: #f5f6fa;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.filter-controls button.active {
+  background: #3498db;
+  color: white;
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+.assembly-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.assembly-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.assembly-content {
+  display: flex;
+  padding: 1.5rem;
+}
+
+.assembly-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  border-right: 2px solid #eee;
+  padding-right: 1.5rem;
+}
+
+.assembly-date .day {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.assembly-date .month {
+  color: #666;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.assembly-info {
+  padding-left: 1.5rem;
+  flex: 1;
+}
+
+.assembly-info h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.incharge {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.special-note {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #fff3cd;
+  border-radius: 4px;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+.assembly-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .assemblies-page {
+    padding: 2rem 1rem;
+  }
+
+  .assembly-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .assembly-date {
+    border-right: none;
+    border-bottom: 2px solid #eee;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+  }
+
+  .assembly-info {
+    padding-left: 0;
+  }
+} 

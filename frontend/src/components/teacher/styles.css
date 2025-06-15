@@ -1,0 +1,86 @@
+/* General styles for the teacher components */
+.teacher-container {
+  width: 100%;
+  padding: 24px;
+}
+
+.teacher-paper {
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.teacher-title {
+  margin-bottom: 16px;
+}
+
+.teacher-button-container {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teacher-table-container {
+  margin-bottom: 24px;
+}
+
+.teacher-loading {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.teacher-snackbar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Specific styles for the Profile and Password management dialogs */
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+/* Dashboard specific styles */
+.quick-stats-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+  transition: transform 0.2s ease-in-out;
+}
+
+.quick-stats-card:hover {
+  transform: translateY(-5px);
+}
+
+.schedule-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.notifications-card {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+}
+
+.profile-banner {
+  background: linear-gradient(90deg, #1976d2, #2196f3);
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.action-button {
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

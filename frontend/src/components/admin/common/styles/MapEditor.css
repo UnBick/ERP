@@ -1,0 +1,42 @@
+.map-editor {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-box-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.location-search {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.coordinates-display {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.coordinates-display p {
+  margin: 0;
+  font-family: monospace;
+  color: #666;
+}
+
+.map-editor .gm-style {
+  border-radius: 8px;
+}
+
+.map-editor .gm-style-iw {
+  padding: 12px;
+}

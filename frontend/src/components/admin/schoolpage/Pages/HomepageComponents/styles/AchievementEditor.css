@@ -1,0 +1,67 @@
+.achievement-editor {
+  padding: 1.5rem;
+}
+
+.achievement-item {
+  background: white;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #666;
+}
+
+.achievement-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.icon-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.icon-option {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon-option:hover {
+  background: #e0e0e0;
+}
+
+.icon-option.selected {
+  background: #1a237e;
+  color: white;
+}
+
+.achievement-preview {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .achievement-item {
+    grid-template-columns: 1fr;
+  }
+}

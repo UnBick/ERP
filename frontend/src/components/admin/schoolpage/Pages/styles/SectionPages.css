@@ -1,0 +1,61 @@
+.section-landing {
+  padding: 2rem;
+}
+
+.section-landing h1 {
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+.sub-pages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.sub-page-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.sub-page-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.card-icon {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.sub-page-card h3 {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.sub-page-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.edit-indicator {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  color: var(--primary-color);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sub-page-card:hover .edit-indicator {
+  opacity: 1;
+}

@@ -1,0 +1,183 @@
+/* LoginForm.css */
+
+.login-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('../../../public/assets/images/img.jpg') no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  max-height: 100vh;
+  margin: auto;
+}
+
+.login-box {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Add floating label animation (optional) */
+.form-group input:not(:placeholder-shown) {
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+.form-group input:not(:placeholder-shown) + label {
+  transform: translateY(-12px);
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Ensure icons stay inside the input box */
+.form-group .icon {
+  position: absolute;
+  right: 15px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(45deg, #8a2be2, #4b0082);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+.btn-login:hover {
+  background: linear-gradient(45deg, #4b0082, #8a2be2);
+}
+
+.forgot-password-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.toggle-login-method button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.toggle-login-method button:hover {
+  text-decoration: underline;
+}
+
+/* Add responsive styles */
+@media screen and (max-width: 768px) {
+  .login-box {
+    padding: 20px;
+    width: 90%;
+  }
+
+  .form-group input {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+
+  .login-title {
+    font-size: 20px;
+  }
+
+  .btn-login {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .login-wrapper {
+    padding: 10px;
+  }
+
+  .login-box {
+    padding: 15px;
+  }
+
+  .form-group {
+    padding: 8px;
+  }
+
+  .form-group input {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

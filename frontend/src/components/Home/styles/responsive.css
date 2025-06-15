@@ -1,0 +1,145 @@
+/* Responsive Styles for Public Site */
+
+/* Global responsive fixes */
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tablets and smaller desktops */
+@media screen and (max-width: 1024px) {
+    .hero-content h1 {
+        font-size: 2.5em;
+    }
+
+    .achievements-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Tablets */
+@media screen and (max-width: 768px) {
+    .navbar {
+        padding: 10px;
+    }
+
+    .nav-links {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .nav-links.active {
+        display: block;
+    }
+
+    .nav-links ul {
+        flex-direction: column;
+    }
+
+    .nav-links li {
+        margin: 10px 0;
+    }
+
+    .dropdown-content {
+        position: static;
+        box-shadow: none;
+        padding-left: 20px;
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    .hero-content {
+        padding: 40px 20px;
+    }
+
+    .events-calendar {
+        margin: 20px;
+    }
+
+    .calendar-container {
+        max-width: 100%;
+    }
+
+    .slider-container {
+        margin: 20px;
+    }
+}
+
+/* Mobile devices */
+@media screen and (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 2em;
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .calendar-day {
+        font-size: 0.8em;
+        padding: 5px;
+    }
+
+    .slider img {
+        height: 200px;
+    }
+
+    .home-content {
+        gap: 1rem;
+    }
+  
+    .calendar-section,
+    .gallery-section,
+    .achievements-section {
+        margin: 0.5rem auto;
+    }
+}
+
+/* Tablet optimization */
+@media screen and (min-width: 481px) and (max-width: 1024px) {
+  .home-content {
+    gap: 1.5rem;
+  }
+}
+
+/* Landscape phone handling */
+@media screen and (max-height: 480px) and (orientation: landscape) {
+  .home-content {
+    gap: 1rem;
+  }
+  
+  .standalone {
+    margin: 1rem auto;
+  }
+}

@@ -1,0 +1,42 @@
+.notice-editor {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  padding: 1.5rem;
+}
+
+.notices-list {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.notice-item {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.notice-item.draft { background: #f5f5f5; }
+.notice-item.published { background: #e8f5e9; }
+.notice-item.expired { background: #ffebee; }
+
+.priority {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.priority.high { background: #ffebee; color: #c62828; }
+.priority.normal { background: #e8f5e9; color: #2e7d32; }
+.priority.low { background: #f5f5f5; color: #424242; }
+
+.notice-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

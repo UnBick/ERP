@@ -1,0 +1,13 @@
+
+.admin-content-layout {
+  padding: 24px;
+}
+
+.content-paper {
+  padding: 24px;
+  min-height: calc(100vh - 180px);
+}
+
+.validation-errors {
+  margin-bottom: 16px;
+}

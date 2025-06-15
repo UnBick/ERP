@@ -1,0 +1,28 @@
+/* frontend/src/components/UnbickSchooling/PredefineSyllabus.css */
+.predefine-syllabus-container {
+    padding: 20px;
+  }
+  
+  .syllabus-section, .videos-section, .assignments-section {
+    margin-bottom: 20px;
+  }
+  
+  .input-group {
+    display: flex;
+    margin-top: 10px;
+  }
+  
+  .input-group input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .input-group button {
+    padding: 5px 10px;
+  }
+  
+  iframe {
+    width: 100%;
+    height: 315px;
+  }

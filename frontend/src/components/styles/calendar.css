@@ -1,0 +1,35 @@
+.calendar-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.event-calendar {
+  min-height: 600px;
+}
+
+.event-item {
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin: 2px 0;
+  cursor: pointer;
+}
+
+.calendar-legend {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+}
