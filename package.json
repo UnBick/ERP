@@ -24,7 +24,6 @@
     "cleanup": "npm run stop && rimraf **/node_modules",
     "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
     "install-all": "concurrently \"cd backend && npm install\" \"cd frontend && npm install\"",
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
-    "postinstall": "npm run install-all"
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\""
   }
 }
