@@ -6,26 +6,33 @@
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.11.0",
     "axios": "^1.7.9",
+    "npm-run-all": "^4.1.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
-    "recharts": "^2.15.0",
-    "concurrently": "^8.2.2"
+    "recharts": "^2.15.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3"
-    
   },
   "scripts": {
-    "stop": "node shutdown.js",
-    "dev:stop": "npm run stop",
-    "cleanup": "npm run stop && rimraf **/node_modules",
-    "postinstall": "npm install concurrently --save",
-    "start": "npx concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
-    "install-all": "concurrently \"npm install --prefix backend\" \"npm install --prefix frontend\"",
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run start --prefix frontend\""
+  "stop": "node shutdown.js",
+  "dev:stop": "npm run stop",
+  "cleanup": "npm run stop && rimraf **/node_modules",
+  "postinstall": "npm install npm-run-all --save-dev",
+  
+  "start:backend": "npm run start --prefix backend",
+  "start:frontend": "npm run start --prefix frontend",
+  "start": "npm-run-all --parallel start:backend start:frontend",
+
+  "install:backend": "npm install --prefix backend",
+  "install:frontend": "npm install --prefix frontend",
+  "install-all": "npm-run-all --parallel install:backend install:frontend",
+
+  "dev:backend": "npm run dev --prefix backend",
+  "dev": "npm-run-all --parallel dev:backend start:frontend"
   }
 }
