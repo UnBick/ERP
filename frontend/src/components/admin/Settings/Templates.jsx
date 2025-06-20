@@ -82,7 +82,7 @@ import {
   ArrowBack,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import SplitPane from 'react-split-pane';
+import SplitPane from 'react18-split-pane';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { getApiUrl, API_ENDPOINTS } from '../../../config/apiConfig';
 import { v4 as uuidv4 } from 'uuid';
