@@ -64,7 +64,8 @@
     "web-vitals": "^4.2.4",
     "xlsx": "^0.18.5",
     "yet-another-react-lightbox": "^3.21.7",
-    "serve": "^14.2.0"
+    "serve": "^14.2.0",
+    "react18-split-pane": "^0.1.4"
   },
   "scripts": {
     "start": "serve -s build",
