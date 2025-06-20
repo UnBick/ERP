@@ -5,7 +5,7 @@ const Parent = require('../models/parentModel');
 const Student = require('../../student/models/studentModel');
 const StudentAttendance = require('../../student/models/studentAttendanceModel');
 const Attendance = require('../../student/models/attendanceModel');
-const LeaveRequest = require('../../student/models/leaveRequestModel');
+const LeaveRequest = require('../../student/models/LeaveRequestModel');
 
 exports.getAttendance = catchAsync(async (req, res) => {
     const { studentId } = req.params;
