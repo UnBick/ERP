@@ -1,6 +1,6 @@
 const catchAsync = require('../../../utils/catchAsync');
 const ApiResponse = require('../../../utils/apiResponse');
-const Parent = require('../models/ParentModel');
+const Parent = require('../models/parentModel');
 const Student = require('../../student/models/studentModel');
 const Attendance = require('../../student/models/attendanceModel');
 const Fee = require('../../fees/models/feeModel');
