@@ -15,6 +15,7 @@ WORKDIR /app
 COPY --from=build /app/build ./build
 COPY --from=build /app/node_modules/.bin/serve ./node_modules/.bin/serve
 COPY --from=build /app/node_modules/serve ./node_modules/serve
+RUN chmod +x ./node_modules/.bin/serve
 
 EXPOSE 3000
 CMD ["npx", "serve", "-s", "build", "-l", "3000"]
