@@ -26,7 +26,6 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "date-fns": "^2.29.3",
-    "erp-backend-models": "file:../backend/src/models",
     "express": "^4.21.2",
     "file-saver": "^2.0.5",
     "framer-motion": "^11.18.0",
@@ -72,7 +71,8 @@
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "chmod +x ./node_modules/.bin/react-scripts"
   },
   "proxy": "http://localhost:5000",
   "browserslist": {
