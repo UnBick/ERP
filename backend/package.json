@@ -34,7 +34,7 @@
         "web-push": "^3.6.7"
     },
     "scripts": {
-        "start": "node index.js",
+        "start": "node src/app.js",
         "dev": "nodemon src/app.js",
         "seed": "node src/utils/seedData.js"
     },
