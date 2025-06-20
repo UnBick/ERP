@@ -2,7 +2,7 @@ const catchAsync = require('../../../utils/catchAsync');
 const ApiResponse = require('../../../utils/apiResponse');
 const StudentAttendance = require('../models/studentAttendanceModel');
 const Student = require('../models/studentModel');
-const LeaveRequest = require('../models/leaveRequestModel');
+const LeaveRequest = require('../models/LeaveRequestModel');
 const mongoose = require('mongoose');
 
 exports.getAttendance = catchAsync(async (req, res) => {
