@@ -66,10 +66,11 @@
     "uuid": "^8.3.2",
     "web-vitals": "^4.2.4",
     "xlsx": "^0.18.5",
-    "yet-another-react-lightbox": "^3.21.7"
+    "yet-another-react-lightbox": "^3.21.7",
+    "serve": "^14.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "serve -s build",
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
