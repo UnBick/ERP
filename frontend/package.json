@@ -29,7 +29,6 @@
     "erp-backend-models": "file:../backend/src/models",
     "express": "^4.21.2",
     "file-saver": "^2.0.5",
-    "font-picker-react": "^3.5.2",
     "framer-motion": "^11.18.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
