@@ -34,6 +34,7 @@ import {
 } from '@mui/icons-material';
 import { academicLevels, academicYears, validateClassData } from '../../../utils/academicUtils';
 import { useAlert } from '../../common/AlertProvider';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Classes = () => {
   const { showAlert } = useAlert();
@@ -65,7 +66,7 @@ const Classes = () => {
   const fetchClasses = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/admin/academic/classes', {
+      const response = await fetch(getApiUrl('/admin/academic/classes'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -129,8 +130,8 @@ const Classes = () => {
     setLoading(true);
     try {
       const url = selectedClass 
-        ? `/api/v1/admin/academic/classes/${selectedClass.id}`
-        : '/api/v1/admin/academic/classes';
+        ? `/admin/academic/classes/${selectedClass.id}`
+        : '/admin/academic/classes';
       
       const requestBody = {
         ...classDetails
@@ -187,7 +188,7 @@ const Classes = () => {
   const handleExportData = async (format) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/academic/classes/export?format=${format}`, {
+      const response = await fetch(getApiUrl(`/admin/academic/classes/export?format=${format}`), {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -43,6 +43,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useInbox } from '../../hooks/useInbox'; // Create this hook
 import { format } from 'date-fns';
+import { getApiUrl } from '../../config/apiConfig'; // Ensure this is correctly set up
 
 const DashboardCard = ({ title, value, icon, gradient }) => (
     <Card
