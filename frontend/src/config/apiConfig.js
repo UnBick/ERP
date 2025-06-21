@@ -1,5 +1,5 @@
 // Use this file for ALL API calls in the frontend
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+export const API_BASE_URL = 'https://backend-production-a762.up.railway.app/api/v1';
 
 export function getApiUrl(path) {
   // Ensure no double slashes
