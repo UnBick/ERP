@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Footer from '../common/Footer';
 import './LoginForm.css';
+import { getApiUrl } from '../../config/apiConfig';
 
 const LoginForm = () => {
   const [showAnimation, setShowAnimation] = useState(true);
@@ -33,7 +34,7 @@ const LoginForm = () => {
     try {
       const userData = { identifier: admissionNumber, password };
   
-      const response = await fetch('/api/v1/auth/login', {  // Updated endpoint path
+      const response = await fetch(getApiUrl('/api/v1/auth/login'), {  // Updated endpoint path
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
