@@ -1,6 +1,10 @@
+// Use this file for ALL API calls in the frontend
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
 
-export const getApiUrl = (endpoint) => `${API_BASE_URL}${endpoint}`;
+export function getApiUrl(path) {
+  // Ensure no double slashes
+  return `${API_BASE_URL.replace(/\/$/, '')}${path.startsWith('/') ? path : '/' + path}`;
+}
 
 export const API_ENDPOINTS = {
   AUTH: {
