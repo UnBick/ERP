@@ -74,7 +74,9 @@ const authController = {
   // User Login
   login: async (req, res) => {
     try {
+      console.log('Login Request Body:', req.body);
       const { identifier, password } = req.body;
+      
 
       // Find user by username or email
       const user = await User.findOne({
