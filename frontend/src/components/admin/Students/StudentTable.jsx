@@ -117,7 +117,8 @@ const StudentTable = ({ onBack }) => {
         queryParams.append('status', filters.status);
       }
 
-      const url = `/api/v1/admin/students?${queryParams.toString()}`;
+      // Fixed: Use getApiUrl for the students endpoint
+      const url = getApiUrl(`/api/v1/admin/students?${queryParams.toString()}`);
       console.log('Fetching URL:', url);
 
       const response = await fetch(url, {
