@@ -29,12 +29,8 @@ import {
 import { Search, Book, History, QrCodeScanner } from '@mui/icons-material';
 import { useAuth } from '../../../contexts/AuthContext';  // Update import
 import { getApiUrl } from '../../../config/apiConfig';
-<<<<<<< HEAD
 
-
-=======
 const API_BASE_URL = getApiUrl('/api/v1/admin/library');
->>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
 const StaffLibrary = () => {
   const { user } = useAuth();  // Use Auth context instead of Student context
   const [books, setBooks] = useState([]);
@@ -70,11 +66,7 @@ const StaffLibrary = () => {
       });
 
       const token = localStorage.getItem('token');
-<<<<<<< HEAD
-      const response = await fetch(getApiUrl(`/api/v1/admin/library/books?${queryParams}`), {
-=======
       const response = await fetch(`${API_BASE_URL}/books?${queryParams}`, {
->>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -103,11 +95,7 @@ const StaffLibrary = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-<<<<<<< HEAD
-      const response = await fetch(getApiUrl('/api/v1/admin/library/issued-books'), {
-=======
       const response = await fetch(`${API_BASE_URL}/issued-books`, {
->>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
         headers: {
           'Authorization': `Bearer ${token}`
         }

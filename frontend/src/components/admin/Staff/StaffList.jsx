@@ -28,7 +28,6 @@ import StaffTable from './StaffTable';
 import StaffEdit from './StaffEdit';
 import StaffNew from './StaffNew';
 import StaffDocuments from './StaffDocuments';
-import { getApiUrl } from '../../../config/apiConfig';
 
 
 const StaffList = () => {
