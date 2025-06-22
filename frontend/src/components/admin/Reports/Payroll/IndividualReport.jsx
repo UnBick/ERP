@@ -55,6 +55,7 @@ const IndividualReport = () => {
           }
         });
         const data = await response.json();
+        console.log('Staff list response:', data); // Debug log
         if (data.success) {
           setStaffList(data.data || []);
         }
@@ -69,17 +70,29 @@ const IndividualReport = () => {
 
   const handleGenerateReport = async () => {
     if (!selectedStaff || !selectedYear) return;
+    
+    // Find the selected staff object to get additional details
+    const selectedStaffObj = staffList.find(staff => staff._id === selectedStaff);
+    console.log('Selected staff object:', selectedStaffObj); // Debug log
+    console.log('Selected staff ID:', selectedStaff); // Debug log
+    
     setLoading(true);
     setError(null);
+    
     try {
-      const response = await fetch(
-        getApiUrl(`/api/v1/admin/finance/payroll/reports/staff/${selectedStaff}?year=${selectedYear}`),
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+      // Try different ID formats based on what your backend expects
+      const staffId = selectedStaff; // Try _id first
+      
+      const url = getApiUrl(`/api/v1/admin/finance/payroll/reports/staff/${staffId}?year=${selectedYear}`);
+      console.log('API URL:', url); // Debug log
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
-      );
+      });
+      
+      console.log('Response status:', response.status); // Debug log
       const result = await response.json();
       console.log('Staff report data:', result);
 
@@ -89,6 +102,28 @@ const IndividualReport = () => {
       } else {
         setReportData(null);
         setError(result.message || 'Staff not found');
+        
+        // If _id doesn't work, try with staffID or employeeId
+        if (selectedStaffObj && (selectedStaffObj.staffID || selectedStaffObj.employeeId)) {
+          console.log('Trying alternative ID...');
+          const alternativeId = selectedStaffObj.staffID || selectedStaffObj.employeeId;
+          const alternativeUrl = getApiUrl(`/api/v1/admin/finance/payroll/reports/staff/${alternativeId}?year=${selectedYear}`);
+          
+          const alternativeResponse = await fetch(alternativeUrl, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          const alternativeResult = await alternativeResponse.json();
+          console.log('Alternative request result:', alternativeResult);
+          
+          if (alternativeResult.success) {
+            setReportData(alternativeResult.data);
+            setDialogOpen(true);
+            setError(null);
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching staff report:', error);
@@ -115,11 +150,14 @@ const IndividualReport = () => {
           <InputLabel>Select Staff</InputLabel>
           <Select
             value={selectedStaff}
-            onChange={(e) => setSelectedStaff(e.target.value)}
+            onChange={(e) => {
+              console.log('Selected staff ID:', e.target.value); // Debug log
+              setSelectedStaff(e.target.value);
+            }}
           >
             {Array.isArray(staffList) && staffList.map((staff) => (
               <MenuItem key={staff._id} value={staff._id}>
-                {staff.name} ({staff.staffID || 'No ID'})
+                {staff.name} ({staff.staffID || staff.employeeId || 'No ID'})
               </MenuItem>
             ))}
           </Select>
@@ -151,6 +189,17 @@ const IndividualReport = () => {
       {error && (
         <Box sx={{ mb: 2 }}>
           <Typography color="error">{error}</Typography>
+        </Box>
+      )}
+
+      {/* Debug information - remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+          <Typography variant="caption">
+            Debug Info - Selected Staff ID: {selectedStaff} | 
+            Total Staff: {staffList.length} |
+            Staff List: {JSON.stringify(staffList.map(s => ({ id: s._id, name: s.name, staffID: s.staffID })))}
+          </Typography>
         </Box>
       )}
 
