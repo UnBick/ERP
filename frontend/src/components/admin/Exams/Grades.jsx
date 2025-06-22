@@ -47,7 +47,7 @@ const Grades = () => {
 
   const fetchGrades = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/v1/exams/exam-grades'));
+      const response = await axios.get(getApiUrl('/api/exams/exam-grades'));
       setGrades(response.data?.data || []);
     } catch (error) {
       console.error('Error fetching grades:', error);

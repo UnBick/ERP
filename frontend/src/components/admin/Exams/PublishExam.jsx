@@ -51,7 +51,7 @@ const PublishExam = () => {
 
   const fetchExamTypes = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/v1/exams'));
+      const response = await axios.get(getApiUrl('/api/exams'));
       console.log('Exam types response:', response.data);
 
       if (response.data.success) {
@@ -70,7 +70,7 @@ const PublishExam = () => {
 
   const fetchPublishSettings = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/v1/exams/publish-settings'));
+      const response = await axios.get(getApiUrl('/api/exams/publish-settings'));
       console.log('Fetched publish settings:', response.data);
       if (response.data.success) {
         // Transform the publish settings data
@@ -92,7 +92,7 @@ const PublishExam = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/v1/exams/classes'));
+      const response = await axios.get(getApiUrl('/api/exams/classes'));
       if (response.data.success) {
         setClasses(response.data.data);
       }
