@@ -33,11 +33,7 @@ const LoginForm = () => {
   
     try {
       const userData = { identifier: admissionNumber, password };
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
       const response = await fetch(getApiUrl('/api/v1/auth/login'), {  // Updated endpoint path
         method: 'POST',
         headers: { 
