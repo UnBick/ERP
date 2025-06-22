@@ -46,72 +46,69 @@ const ParentRoutes = require('./modules/parent/routes/parentRoutes');
 const app = express();
 const server = http.createServer(app);
 
+// CORS setup
+const corsOptions = {
+  origin: ['https://unbick-erp.up.railway.app'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range']
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 // Middleware setup
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(helmet());
 app.set('trust proxy', 1);
 
-// Ensure uploads directory exists with proper permissions
+// Static directories
 const uploadsDir = path.join(__dirname, '../uploads/logos');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true, mode: 0o755 });
 }
-
-// Static files setup - move this before routes
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
 app.use('/public', express.static(path.join(__dirname, '../public')));
 
-// Add CORS headers specifically for images
+// CORS for uploads
 app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 });
 
-// CORS configuration - update this section
-const corsOptions = {
-  origin: ['http://localhost:3000','https://unbick-erp.up.railway.app'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range']
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
 // Rate limiter
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 1000,
-    standardHeaders: true,
-    legacyHeaders: false,
-    skipSuccessfulRequests: true,
-    handler: (req, res) => {
-        res.status(429).json({
-            success: false,
-            message: 'Too many requests, please try again later.'
-        });
-    }
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: 'Too many requests, please try again later.'
+    });
+  }
 });
 app.use('/api/', apiLimiter);
 
 // Create required directories
 [
-    '../uploads',
-    '../assets',
-    '../public/images',
-    '../public/documents',
-    '../uploads/students',
-    '../uploads/staff',
-    '../uploads/documents'
+  '../uploads',
+  '../assets',
+  '../public/images',
+  '../public/documents',
+  '../uploads/students',
+  '../uploads/staff',
+  '../uploads/documents'
 ].forEach(dir => {
-    const dirPath = path.join(__dirname, dir);
-    if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
-    }
+  const dirPath = path.join(__dirname, dir);
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
 });
 
 // Debug middleware
@@ -178,9 +175,6 @@ app.use('/api/v1/teacher/grading',
 // Update the route registration for student routes
 app.use('/api/v1/student', authMiddleware, checkRole(['student']), studentRoutes);
 
-// Remove or comment out these lines
-// app.use('/api/v1/students', authMiddleware, studentRoutes);
-// app.use('/api/v1/student', authMiddleware, studentDashboardRoute);
 
 // Special route for payroll with debug logging
 app.use('/api/v1/admin/finance/payroll', (req, res, next) => {
