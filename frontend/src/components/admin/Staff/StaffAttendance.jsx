@@ -27,7 +27,6 @@ import { getApiUrl } from '../../../config/apiConfig';
 // Add necessary imports for MUI X DatePickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { getApiUrl } from '../../../config/apiConfig';
 
 
 const StaffAttendance = () => {
