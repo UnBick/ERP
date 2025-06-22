@@ -116,14 +116,14 @@ const TeacherDashboard = () => {
             }
 
             const [dashboardResponse, profileResponse] = await Promise.all([
-                fetch('http://localhost:5000/api/v1/teacher/dashboard-data', {
+                fetch(getApiUrl('/api/v1/teacher/dashboard-data'), {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     }
                 }),
-                fetch('http://localhost:5000/api/v1/teacher/profile', {
+                fetch(getApiUrl('/api/v1/teacher/profile'), {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json',
@@ -173,7 +173,7 @@ const TeacherDashboard = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:5000/api/v1/auth/logout', {
+            const response = await fetch(getApiUrl('/api/v1/auth/logout'), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

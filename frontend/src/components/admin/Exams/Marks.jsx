@@ -58,7 +58,7 @@ const Results = () => {
   const fetchExaminations = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(getApiUrl('/api/v1/exams/examinations'));
+      const response = await axios.get(getApiUrl('/api/exams/examinations'));
       if (response.data.success) {
         const transformedExams = response.data.data.map(exam => ({
           id: exam._id,

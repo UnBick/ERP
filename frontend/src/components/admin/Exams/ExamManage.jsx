@@ -48,9 +48,9 @@ const ExamManage = () => {
         console.log('Starting API calls...');
         
         const [classesResponse, subjectsResponse, examTypesResponse] = await Promise.all([
-          axios.get(getApiUrl('/api/v1/exams/classes')),
-          axios.get(getApiUrl('/api/v1/exams/subjects')),
-          axios.get(getApiUrl('/api/v1/exams'))
+          axios.get(getApiUrl('/api/exams/classes')),
+          axios.get(getApiUrl('/api/exams/subjects')),
+          axios.get(getApiUrl('/api/exams'))
         ]);
 
         console.log('Exam Types Response:', examTypesResponse.data);
