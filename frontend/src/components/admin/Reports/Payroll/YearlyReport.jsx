@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import { Download } from '@mui/icons-material';
 
+// NOTE: Ensure that the parent component's onGenerate handler uses getApiUrl for API calls
+
 const YearlyReport = ({ years, onGenerate, data, loading }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 

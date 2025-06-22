@@ -19,6 +19,8 @@ import {
 } from '@mui/material';
 import { Download, PictureAsPdf, TableChart } from '@mui/icons-material';
 
+// NOTE: Ensure that the parent component's onGenerate and onDownload handlers use getApiUrl for API calls
+
 const MonthlyReport = ({ months, years, onGenerate, data, loading, onDownload }) => {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());

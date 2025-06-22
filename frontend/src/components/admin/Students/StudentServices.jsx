@@ -12,31 +12,30 @@ import { Download, Description, Badge, Assignment, School } from '@mui/icons-mat
 import { useSnackbar } from 'notistack';
 import { getApiUrl } from '../../../config/apiConfig';
 
-
 const DOCUMENT_TYPES = {
   REPORT_CARD: {
     title: 'Report Card',
     icon: <Description />,
     description: 'Generate and download student report cards',
-    type: 'reportcard'  // Add this type field to match the template type
+    type: 'reportcard'
   },
   TRANSFER_CERT: {
     title: 'Transfer Certificate',
     icon: <Assignment />,
     description: 'Generate transfer certificates for students',
-    type: 'certificate'  // Add type field
+    type: 'certificate'
   },
   ID_CARD: {
     title: 'ID Card',
     icon: <Badge />,
     description: 'Generate student ID cards',
-    type: 'idcard'  // Add type field
+    type: 'idcard'
   },
   CHARACTER_CERT: {
     title: 'Character Certificate',
     icon: <School />,
     description: 'Generate character certificates',
-    type: 'certificate'  // Add type field
+    type: 'certificate'
   }
 };
 
@@ -45,6 +44,58 @@ const GENERATION_SCOPE = {
   SECTION: 'Entire Section',
   CLASS: 'Entire Class',
   SCHOOL: 'Entire School'
+};
+
+// Enhanced API utility function with better error handling
+const apiRequest = async (url, options = {}) => {
+  const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+  
+  const defaultOptions = {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...options.headers
+    },
+    ...options
+  };
+
+  try {
+    const response = await fetch(url, defaultOptions);
+    
+    // Check if response is ok
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API Error - Status: ${response.status}, Response:`, errorText);
+      
+      if (response.status === 401) {
+        throw new Error('Authentication failed. Please login again.');
+      } else if (response.status === 403) {
+        throw new Error('Access denied. You don\'t have permission for this action.');
+      } else if (response.status === 404) {
+        throw new Error('Requested resource not found.');
+      } else if (response.status >= 500) {
+        throw new Error('Server error. Please try again later.');
+      } else {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+    }
+
+    // Check content type
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      return data;
+    } else {
+      // For file downloads or other content types
+      return response;
+    }
+  } catch (error) {
+    if (error.name === 'SyntaxError' && error.message.includes('Unexpected token')) {
+      console.error('Received HTML instead of JSON. This usually indicates server error or authentication issue.');
+      throw new Error('Server returned an error page. Please check your authentication and try again.');
+    }
+    throw error;
+  }
 };
 
 const ServiceCard = ({ title, icon, description, onRequest }) => (
@@ -84,21 +135,14 @@ const DocumentGenerationDialog = ({
   const [sections, setSections] = useState([]);
   const [students, setStudents] = useState([]);
   const [year] = useState(new Date().getFullYear());
-  const [outputFormat, setOutputFormat] = useState('single'); // Changed default to 'single'
+  const [outputFormat, setOutputFormat] = useState('single');
+  const [loading, setLoading] = useState(false);
 
   const fetchClassData = async () => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(getApiUrl('/api/v1/settings/documents/class-data'), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch class data');
-
-      const data = await response.json();
+      setLoading(true);
+      const data = await apiRequest(getApiUrl('/api/v1/settings/documents/class-data'));
+      
       if (data.success) {
         setClasses(data.data.classes);
       } else {
@@ -106,23 +150,18 @@ const DocumentGenerationDialog = ({
       }
     } catch (error) {
       console.error('Error fetching classes:', error);
-      enqueueSnackbar('Error fetching classes', { variant: 'error' });
+      enqueueSnackbar(`Error fetching classes: ${error.message}`, { variant: 'error' });
+      setClasses([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchSections = async (selectedClassId) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(getApiUrl(`/api/v1/settings/sections/class/${selectedClassId}`), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch sections');
-
-      const data = await response.json();
+      setLoading(true);
+      const data = await apiRequest(getApiUrl(`/api/v1/settings/sections/class/${selectedClassId}`));
+      
       if (data.success) {
         setSections(data.data);
       } else {
@@ -130,18 +169,44 @@ const DocumentGenerationDialog = ({
       }
     } catch (error) {
       console.error('Error fetching sections:', error);
-      enqueueSnackbar('Error fetching sections', { variant: 'error' });
+      enqueueSnackbar(`Error fetching sections: ${error.message}`, { variant: 'error' });
       setSections([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStudents = async (classId, sectionId) => {
+    try {
+      setLoading(true);
+      const url = getApiUrl(`/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}&populate=true`);
+      const data = await apiRequest(url);
+      
+      if (data.success) {
+        setStudents(data.data.students || []);
+      } else {
+        throw new Error(data.message || 'Failed to fetch students');
+      }
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      enqueueSnackbar(`Error fetching students: ${error.message}`, { variant: 'error' });
+      setStudents([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchClassData();
-  }, []);
+    if (open) {
+      fetchClassData();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (classId) {
       fetchSections(classId);
+      setSectionId('');
+      setStudentId('');
     } else {
       setSections([]);
     }
@@ -150,47 +215,18 @@ const DocumentGenerationDialog = ({
   useEffect(() => {
     if (classId && sectionId) {
       fetchStudents(classId, sectionId);
+      setStudentId('');
+    } else {
+      setStudents([]);
     }
   }, [classId, sectionId]);
 
-  const fetchStudents = async (classId, sectionId) => {
-    try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(
-        getApiUrl(`/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}`), {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch students');
-
-      const data = await response.json();
-      if (data.success) {
-        setStudents(data.data.students || []);
-      } else {
-        throw new Error(data.message || 'Failed to fetch students');
-      }
-    } catch (error) {
-      console.error('Error fetching students:', error);
-      enqueueSnackbar('Error fetching students', { variant: 'error' });
-      setStudents([]);
-    }
-  };
-
   const handleClassChange = (event) => {
-    const selectedClassId = event.target.value;
-    setClassId(selectedClassId);
-    setSectionId(''); // Reset section when class changes
-    setStudentId(''); // Reset student when class changes
+    setClassId(event.target.value);
   };
 
   const handleSectionChange = (event) => {
-    const selectedSectionId = event.target.value;
-    setSectionId(selectedSectionId);
-    setStudentId(''); // Reset student when section changes
+    setSectionId(event.target.value);
   };
 
   const handleSubmit = () => {
@@ -208,7 +244,6 @@ const DocumentGenerationDialog = ({
       return;
     }
 
-    // Pass all required data
     onGenerate({
       documentType,
       scope,
@@ -216,13 +251,7 @@ const DocumentGenerationDialog = ({
       sectionId,
       studentId,
       year,
-      // Add any other relevant data
-      currentScope: scope,
-      selectedClass: classId,
-      selectedSection: sectionId,
-      selectedStudent: studentId,
-      academicYear: year,
-      outputFormat // Pass the output format
+      outputFormat
     });
     onClose();
   };
@@ -248,6 +277,12 @@ const DocumentGenerationDialog = ({
         <Typography variant="h6" gutterBottom>
           Generate {title}
         </Typography>
+
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <CircularProgress size={24} />
+          </Box>
+        )}
 
         <FormControl component="fieldset" sx={{ mb: 2 }}>
           <Typography variant="subtitle2" gutterBottom>
@@ -275,6 +310,7 @@ const DocumentGenerationDialog = ({
               value={classId}
               onChange={handleClassChange}
               label="Class"
+              disabled={loading}
             >
               <MenuItem value="">Select Class</MenuItem>
               {Array.isArray(classes) && classes.map((cls) => (
@@ -293,10 +329,11 @@ const DocumentGenerationDialog = ({
               value={sectionId}
               onChange={handleSectionChange}
               label="Section"
+              disabled={loading}
             >
               <MenuItem value="">Select Section</MenuItem>
               {Array.isArray(sections) && sections.map((section) => (
-                <MenuItem key={`section-${section._id}`} value={section._id}>
+                <MenuItem key={section._id} value={section._id}>
                   {section.name}
                 </MenuItem>
               ))}
@@ -311,18 +348,18 @@ const DocumentGenerationDialog = ({
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
               label="Student"
+              disabled={loading}
             >
               <MenuItem value="">Select Student</MenuItem>
               {Array.isArray(students) && students.map((student) => (
-                <MenuItem key={`student-${student._id}`} value={student._id}>
-                  {`${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`}
+                <MenuItem key={student._id} value={student._id}>
+                  {`${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`.trim() || 'Unnamed Student'}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         )}
 
-        {/* Add format selection before the generate button */}
         {(scope === 'SECTION' || scope === 'CLASS' || scope === 'SCHOOL') && (
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>Output Format</InputLabel>
@@ -338,13 +375,13 @@ const DocumentGenerationDialog = ({
         )}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button onClick={onClose}>
+          <Button onClick={onClose} disabled={loading}>
             Cancel
           </Button>
           <Button 
             variant="contained"
             onClick={handleSubmit}
-            disabled={!isFormValid()}
+            disabled={!isFormValid() || loading}
           >
             Generate
           </Button>
@@ -363,85 +400,88 @@ const StudentServices = () => {
   const handleGenerateDocument = async (data) => {
     setLoading(true);
     try {
-        const docType = DOCUMENT_TYPES[data.documentType]?.type;
-        if (!docType) {
-            throw new Error(`Invalid document type: ${data.documentType}`);
-        }
+      const docType = DOCUMENT_TYPES[data.documentType]?.type;
+      if (!docType) {
+        throw new Error(`Invalid document type: ${data.documentType}`);
+      }
 
-        // Fetch students based on scope
-        const studentsData = await fetchStudentData({
-            scope: data.scope,
-            studentId: data.studentId,
-            classId: data.classId,
-            sectionId: data.sectionId,
-            year: data.year
-        });
+      console.log('Starting document generation with data:', data);
 
-        // Ensure studentsData is always an array
-        const students = Array.isArray(studentsData) ? studentsData : [studentsData];
-        console.log(`Processing ${students.length} students`);
+      // Fetch students based on scope
+      const studentsData = await fetchStudentData({
+        scope: data.scope,
+        studentId: data.studentId,
+        classId: data.classId,
+        sectionId: data.sectionId,
+        year: data.year
+      });
 
-        // Fetch template
-        const templateResponse = await fetch(getApiUrl(`/api/v1/settings/templates/type/${docType}?active=true`), {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
+      const students = Array.isArray(studentsData) ? studentsData : [studentsData];
+      console.log(`Processing ${students.length} students`);
+
+      if (students.length === 0) {
+        throw new Error('No students found for the selected criteria');
+      }
+
+      // Fetch template
+      const templateData = await apiRequest(
+        getApiUrl(`/api/v1/settings/templates/type/${docType}?active=true`)
+      );
+
+      if (!templateData.success || !templateData.data.length) {
+        throw new Error(`No active template found for ${DOCUMENT_TYPES[data.documentType].title}`);
+      }
+
+      const templateToUse = templateData.data[0];
+      
+      // Generate documents
+      const response = await fetch(getApiUrl('/api/v1/settings/documents/generate-batch'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({
+          documentType: docType,
+          template: templateToUse.template,
+          students: students.map(student => ({
+            studentData: student,
+            customData: {
+              schoolName: 'Your School Name',
+              schoolLogo: '/path/to/logo',
+              studentName: `${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`.trim(),
+              className: `${student.academicInfo?.class?.name || ''} ${student.academicInfo?.section?.name || ''}`.trim(),
+              schoolYear: data.year || new Date().getFullYear(),
+              teacherName: student.academicInfo?.classTeacher?.name || 'Not Assigned',
+              subjects: student.grades || []
             }
-        });
+          })),
+          outputFormat: data.scope === 'INDIVIDUAL' ? 'single' : (data.outputFormat || 'single')
+        })
+      });
 
-        const templateData = await templateResponse.json();
-        if (!templateData.success || !templateData.data.length) {
-            throw new Error(`No active template found for ${DOCUMENT_TYPES[data.documentType].title}`);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Document generation failed:', errorText);
+        throw new Error('Failed to generate documents');
+      }
 
-        const templateToUse = templateData.data[0];
-        
-        // For all types of generation, use the same endpoint
-        const response = await fetch(getApiUrl('/api/v1/settings/documents/generate-batch'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({
-                documentType: docType,
-                template: templateToUse.template,
-                students: students.map(student => ({
-                    studentData: student,
-                    customData: {
-                        schoolName: 'Your School Name',
-                        schoolLogo: '/path/to/logo',
-                        studentName: `${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`.trim(),
-                        className: `${student.academicInfo?.class?.name || ''} ${student.academicInfo?.section?.name || ''}`.trim(),
-                        schoolYear: data.year || new Date().getFullYear(),
-                        teacherName: student.academicInfo?.classTeacher?.name || 'Not Assigned',
-                        subjects: student.grades || []
-                    }
-                })),
-                outputFormat: data.scope === 'INDIVIDUAL' ? 'single' : (data.outputFormat || 'single') // Force single for individual and default to single for others
-            })
-        });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${docType}_documents_${Date.now()}.${data.outputFormat === 'multiple' ? 'zip' : 'pdf'}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
 
-        if (!response.ok) {
-            throw new Error('Failed to generate documents');
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${docType}_documents_${Date.now()}.${data.outputFormat === 'multiple' ? 'zip' : 'pdf'}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-
-        enqueueSnackbar(`Successfully generated document${students.length > 1 ? 's' : ''}`, { variant: 'success' });
+      enqueueSnackbar(`Successfully generated document${students.length > 1 ? 's' : ''}`, { variant: 'success' });
     } catch (error) {
-        console.error('Document generation error:', error);
-        enqueueSnackbar(error.message || 'Failed to generate document', { variant: 'error' });
+      console.error('Document generation error:', error);
+      enqueueSnackbar(`Document generation failed: ${error.message}`, { variant: 'error' });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -450,31 +490,29 @@ const StudentServices = () => {
     let endpoint = '/api/v1/admin/students';
     
     switch (scope) {
-        case 'INDIVIDUAL':
-            endpoint += `/${studentId}?populate=true`; // Add populate parameter
-            break;
-        case 'SECTION':
-            endpoint += `?classId=${classId}&sectionId=${sectionId}&populate=true`;
-            break;
-        case 'CLASS':
-            endpoint += `?classId=${classId}&populate=true`;
-            break;
-        case 'SCHOOL':
-            endpoint += '?populate=true';
-            break;
+      case 'INDIVIDUAL':
+        endpoint += `/${studentId}?populate=true`;
+        break;
+      case 'SECTION':
+        endpoint += `?classId=${classId}&sectionId=${sectionId}&populate=true`;
+        break;
+      case 'CLASS':
+        endpoint += `?classId=${classId}&populate=true`;
+        break;
+      case 'SCHOOL':
+        endpoint += '?populate=true';
+        break;
     }
 
-    const response = await fetch(endpoint, {
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-        }
-    });
-
-    if (!response.ok) throw new Error('Failed to fetch student data');
+    console.log('Fetching student data from:', getApiUrl(endpoint));
     
-    const responseData = await response.json();
-    return responseData.success ? (scope === 'INDIVIDUAL' ? responseData.data : responseData.data.students) : null;
+    const responseData = await apiRequest(getApiUrl(endpoint));
+    
+    if (!responseData.success) {
+      throw new Error(responseData.message || 'Failed to fetch student data');
+    }
+    
+    return scope === 'INDIVIDUAL' ? responseData.data : responseData.data.students;
   };
 
   return (
@@ -493,7 +531,7 @@ const StudentServices = () => {
                 description={value.description}
                 onRequest={() => {
                   setSelectedDocument(key);
-                  setOpenDialog(true);  // Fixed missing parenthesis
+                  setOpenDialog(true);
                 }}
               />
             </Grid>
