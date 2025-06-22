@@ -58,7 +58,7 @@ const LoginForm = () => {
         }
   
         // 🔹 Store token in localStorage for future authentication
-        localStorage.setItem('authToken', token);
+        localStorage.setItem('token', token);
   
         // 🔹 Store user details in localStorage (optional)
         localStorage.setItem('user', JSON.stringify(user));
