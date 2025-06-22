@@ -24,7 +24,6 @@ import {
 } from '@mui/material';
 import { getApiUrl } from '../../../config/apiConfig';
 
-
 const StaffEdit = ({ onBack }) => {
   const [tabValue, setTabValue] = useState(0);
   const [selectedStaff, setSelectedStaff] = useState([]);
