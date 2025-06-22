@@ -75,6 +75,14 @@ const authController = {
   login: async (req, res) => {
     try {
       console.log('Login Request Body:', req.body);
+       // 🔐 Check if JWT_SECRET is defined
+    if (!process.env.JWT_SECRET) {
+      console.error('🚨 JWT_SECRET is missing in environment variables!');
+      return res.status(500).json({
+        success: false,
+        message: 'Server misconfiguration: JWT_SECRET not set.'
+      });
+    }
       const { identifier, password } = req.body;
       
 
