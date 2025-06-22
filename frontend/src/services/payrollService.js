@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:5000/api/v1/admin/finance/payroll';
+import { getApiUrl } from '../config/apiConfig';
+const API_BASE_URL = getApiUrl('api/v1/admin/finance/payroll');
 
 const getMonthNumber = (monthName) => {
     const months = [
