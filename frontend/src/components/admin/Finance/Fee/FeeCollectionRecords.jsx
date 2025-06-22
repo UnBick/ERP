@@ -15,6 +15,8 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const FeeCollectionRecords = () => {
   const [feeCollectionRecords, setFeeCollectionRecords] = useState([]);
@@ -29,7 +31,7 @@ const FeeCollectionRecords = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/collections', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/collections'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

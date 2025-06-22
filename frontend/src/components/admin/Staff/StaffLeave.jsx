@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import { CloudUpload, Assessment } from '@mui/icons-material';
 import { useStudent } from '../Students/context/StudentContext'; // Reusing context for simplicity
+import { getApiUrl } from '../../../config/apiConfig';
 
 const StaffLeave = () => {
   const { currentUser } = useStudent();
@@ -53,7 +54,7 @@ const StaffLeave = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/leave-requests', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/leave-requests'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -80,7 +81,7 @@ const StaffLeave = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const staffId = currentUser?._id; // Get current user's ID
-      const response = await fetch(`/api/v1/admin/staff/leave-balance?staffId=${staffId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff/leave-balance?staffId=${staffId}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -115,7 +116,7 @@ const StaffLeave = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/leave/apply', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/leave/apply'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

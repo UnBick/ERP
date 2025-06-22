@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { payrollService } from '../../../../../src/services/payrollService';
 import { Download } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -47,7 +48,7 @@ const IndividualReport = () => {
   useEffect(() => {
     const fetchStaffList = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/v1/admin/staff', {
+        const response = await fetch(getApiUrl('/api/v1/admin/staff'), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -70,7 +71,7 @@ const IndividualReport = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/admin/finance/payroll/reports/staff/${selectedStaff}?year=${selectedYear}`,
+        getApiUrl(`/api/v1/admin/finance/payroll/reports/staff/${selectedStaff}?year=${selectedYear}`),
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

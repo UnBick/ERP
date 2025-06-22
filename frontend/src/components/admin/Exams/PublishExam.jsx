@@ -24,6 +24,8 @@ import { useNavigate } from 'react-router-dom';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const PublishExam = () => {
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ const PublishExam = () => {
 
   const fetchExamTypes = async () => {
     try {
-      const response = await axios.get('/api/exams');
+      const response = await axios.get(getApiUrl('/api/v1/exams'));
       console.log('Exam types response:', response.data);
 
       if (response.data.success) {
@@ -68,7 +70,7 @@ const PublishExam = () => {
 
   const fetchPublishSettings = async () => {
     try {
-      const response = await axios.get('/api/exams/publish-settings');
+      const response = await axios.get(getApiUrl('/api/v1/exams/publish-settings'));
       console.log('Fetched publish settings:', response.data);
       if (response.data.success) {
         // Transform the publish settings data
@@ -90,7 +92,7 @@ const PublishExam = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/exams/classes');
+      const response = await axios.get(getApiUrl('/api/v1/exams/classes'));
       if (response.data.success) {
         setClasses(response.data.data);
       }
@@ -125,9 +127,9 @@ const PublishExam = () => {
       }
 
       if (selectedSetting.id) {
-        await axios.put(`/api/exams/publish-settings/${selectedSetting.id}`, selectedSetting);
+        await axios.put(getApiUrl(`/api/v1/exams/publish-settings/${selectedSetting.id}`), selectedSetting);
       } else {
-        const response = await axios.post('/api/exams/publish-settings', selectedSetting);
+        const response = await axios.post(getApiUrl('/api/v1/exams/publish-settings'), selectedSetting);
         if (!response.data.success) {
           alert(response.data.message);
           return;

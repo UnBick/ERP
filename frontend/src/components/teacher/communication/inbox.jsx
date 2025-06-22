@@ -30,6 +30,7 @@ import {
     Notifications
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     margin: theme.spacing(2),
@@ -53,7 +54,7 @@ const Inbox = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await fetch(
-                'http://localhost:5000/api/v1/teacher/communication/inbox',
+                getApiUrl('/api/v1/teacher/communication/inbox'),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -73,7 +74,7 @@ const Inbox = () => {
         try {
             const token = localStorage.getItem('authToken');
             await fetch(
-                `http://localhost:5000/api/v1/teacher/communication/messages/${messageId}/${action}`,
+                getApiUrl(`/api/v1/teacher/communication/messages/${messageId}/${action}`),
                 {
                     method: 'PUT',
                     headers: {

@@ -8,6 +8,7 @@ import {
   TimelineContent,
   TimelineDot,
 } from '@mui/lab';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const StudentPredefineSyllabus = () => {
   const [progressStats, setProgressStats] = useState({
@@ -29,7 +30,7 @@ const StudentPredefineSyllabus = () => {
     // Fetch progress stats from an API or calculate based on syllabus data
     const fetchProgressStats = async () => {
       // Example data fetching logic
-      const response = await fetch('/api/progress');
+      const response = await fetch(getApiUrl('/api/v1/student/progress'));
       const data = await response.json();
       setProgressStats(data);
     };
@@ -40,7 +41,7 @@ const StudentPredefineSyllabus = () => {
   useEffect(() => {
     const fetchLearningProgress = async () => {
       try {
-        const response = await fetch('/api/student/learning-progress');
+        const response = await fetch(getApiUrl('/api/v1/student/learning-progress'));
         const data = await response.json();
         setLearningPath(data);
       } catch (error) {

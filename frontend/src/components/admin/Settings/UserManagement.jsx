@@ -84,8 +84,8 @@ const UserManagement = () => {
       const token = localStorage.getItem('token');
       // Fix: Remove double api/v1
       const url = user 
-        ? getApiUrl(`/v1/users/${user._id}`)
-        : getApiUrl('/v1/users');
+        ? getApiUrl(`api/v1/users/${user._id}`)
+        : getApiUrl('api/v1/users');
 
       const response = await fetch(url, {
         method: user ? 'PUT' : 'POST',
@@ -117,7 +117,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem('token');
       // Fix: Remove double api/v1
-      const response = await fetch(getApiUrl(`/v1/users/${userId}`), {
+      const response = await fetch(getApiUrl(`/api/v1/users/${userId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

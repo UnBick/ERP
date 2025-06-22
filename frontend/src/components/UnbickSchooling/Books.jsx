@@ -25,6 +25,7 @@ import {
 import { Add, Edit, Delete, Download, Preview, Search } from '@mui/icons-material';
 import PDFViewer from '../common/PDFViewer';  // Change to default import
 import { saveAs } from 'file-saver';
+import { getApiUrl } from '../../config/apiConfig';
 
 const Books = ({ role }) => {
   const [books, setBooks] = useState([]); // Initialize books as an empty array
@@ -59,7 +60,7 @@ const Books = ({ role }) => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('/api/books');
+        const response = await axios.get(getApiUrl('/api/v1/books'));
         setBooks(response.data.books || []); // Ensure books is always an array
       } catch (error) {
         console.error('Error fetching books:', error);
@@ -68,7 +69,7 @@ const Books = ({ role }) => {
 
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get(getApiUrl('/api/v1/categories'));
         setCategories(response.data.categories || []); // Ensure categories is always an array
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -77,7 +78,7 @@ const Books = ({ role }) => {
 
     const fetchPdfs = async () => {
       try {
-        const response = await axios.get('/api/pdfs');
+        const response = await axios.get(getApiUrl('/api/v1/pdfs'));
         setPdfs(response.data.pdfs || []); // Ensure PDFs is always an array
       } catch (error) {
         console.error('Error fetching PDFs:', error);
@@ -99,7 +100,7 @@ const Books = ({ role }) => {
 
   const handleUploadBook = async (formData) => {
     try {
-      const response = await fetch('/api/books/upload', {
+      const response = await fetch(getApiUrl('/api/v1/books/upload'), {
         method: 'POST',
         body: formData
       });
@@ -145,7 +146,7 @@ const Books = ({ role }) => {
 
   const handleCreateCollection = async (name, books) => {
     try {
-      const response = await fetch('/api/books/collections', {
+      const response = await fetch(getApiUrl('/api/v1/books/collections'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, books })

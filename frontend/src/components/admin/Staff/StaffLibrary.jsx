@@ -28,7 +28,8 @@ import {
 } from '@mui/material';
 import { Search, Book, History, QrCodeScanner } from '@mui/icons-material';
 import { useAuth } from '../../../contexts/AuthContext';  // Update import
-
+import { getApiUrl } from '../../../config/apiConfig';
+const API_BASE_URL = getApiUrl('/api/v1/admin/library');
 const StaffLibrary = () => {
   const { user } = useAuth();  // Use Auth context instead of Student context
   const [books, setBooks] = useState([]);
@@ -64,7 +65,7 @@ const StaffLibrary = () => {
       });
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/library/books?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/books?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -93,7 +94,7 @@ const StaffLibrary = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/library/issued-books', {
+      const response = await fetch(`${API_BASE_URL}/issued-books`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -129,7 +130,7 @@ const StaffLibrary = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const endpoint = `/api/v1/admin/library/${action}-book`;
+      const endpoint = `${API_BASE_URL}/${action}-book`;
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -223,7 +224,7 @@ const StaffLibrary = () => {
   const handlePayFine = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/library/pay-fine', {
+      const response = await fetch(getApiUrl('/api/v1/library/pay-fine'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -257,7 +258,7 @@ const StaffLibrary = () => {
   const fetchRecommendations = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/library/recommendations', {
+      const response = await fetch(getApiUrl('/api/v1/admin/library/recommendations'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

@@ -38,6 +38,7 @@ import {
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const AttendanceReports = () => {
   const [attendanceReports, setAttendanceReports] = useState([]);
@@ -114,8 +115,8 @@ const AttendanceReports = () => {
       const token = localStorage.getItem('token');
       
       console.log('Fetching classes with token:', token ? 'Present' : 'Missing');
-      
-      const response = await fetch('http://localhost:5000/api/v1/admin/classes', {
+
+      const response = await fetch(getApiUrl('/api/v1/admin/classes'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -154,7 +155,7 @@ const AttendanceReports = () => {
         console.log('Fetching sections for class:', classId); // Debug log
 
         const response = await fetch(
-            `http://localhost:5000/api/v1/admin/classes/${classId}/sections`,
+            getApiUrl(`/api/v1/admin/classes/${classId}/sections`),
             {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -225,7 +226,7 @@ const AttendanceReports = () => {
         });
 
         const response = await fetch(
-            `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/v1/admin/reports/attendance?${params}`, {
+            getApiUrl(`/api/v1/admin/reports/attendance?${params}`), {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

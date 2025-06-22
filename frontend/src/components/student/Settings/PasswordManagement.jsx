@@ -11,6 +11,7 @@ import {
   Alert,
   LinearProgress,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const PasswordManagement = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -52,7 +53,7 @@ const PasswordManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/student/settings/security/password', {
+      const response = await fetch(getApiUrl('/api/v1/student/settings/security/password'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

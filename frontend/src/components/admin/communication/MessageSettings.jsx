@@ -49,6 +49,8 @@ import {
   ScheduleSend
 } from '@mui/icons-material';
 import { MESSAGE_ENDPOINTS } from '../../../utils/api';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const MessageSettings = () => {
   const [loading, setLoading] = useState(false);
@@ -92,7 +94,7 @@ const MessageSettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(MESSAGE_ENDPOINTS.SETTINGS, {
+      const response = await fetch(getApiUrl(MESSAGE_ENDPOINTS.SETTINGS), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -118,7 +120,7 @@ const MessageSettings = () => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch(MESSAGE_ENDPOINTS.TEMPLATES, {
+      const response = await fetch(getApiUrl(MESSAGE_ENDPOINTS.TEMPLATES), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -144,7 +146,7 @@ const MessageSettings = () => {
 
   const fetchMessageHistory = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/v1/admin/messages/history', {
+      const response = await fetch(getApiUrl('/api/v1/admin/messages/history'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -163,7 +165,7 @@ const MessageSettings = () => {
 
   const handleSettingChange = async (setting, value) => {
     try {
-      const response = await fetch(MESSAGE_ENDPOINTS.SETTINGS, {
+      const response = await fetch(getApiUrl(MESSAGE_ENDPOINTS.SETTINGS), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +197,7 @@ const MessageSettings = () => {
 
   const handleScheduleMessage = async () => {
     try {
-      const response = await fetch(MESSAGE_ENDPOINTS.SCHEDULE, {
+      const response = await fetch(getApiUrl(MESSAGE_ENDPOINTS.SCHEDULE), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -265,7 +267,7 @@ const MessageSettings = () => {
   const handleSendMessage = async () => {
     setLoading(true);
     try {
-      const response = await fetch(MESSAGE_ENDPOINTS.SEND, {
+      const response = await fetch(getApiUrl(MESSAGE_ENDPOINTS.SEND), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -326,7 +328,7 @@ const MessageSettings = () => {
 
   const handleDeleteTemplate = async (templateId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/admin/settings/message-templates/${templateId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/settings/message-templates/${templateId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

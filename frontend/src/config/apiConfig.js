@@ -2,7 +2,7 @@
 console.log('[ENV] REACT_APP_API_URL =', process.env.REACT_APP_API_URL);
 
 export const API_BASE_URL =
-  process.env.REACT_APP_API_URL || 'https://backend-production-a762.up.railway.app/api/v1';
+  process.env.REACT_APP_API_URL || 'https://backend-production-a762.up.railway.app';
 
   console.log('[API] Final API_BASE_URL =', API_BASE_URL);
 

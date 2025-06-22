@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/lab';
 import { saveAs } from 'file-saver';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const FinanceReports = () => {
   const [financeReports, setFinanceReports] = useState([]);
@@ -53,7 +54,7 @@ const FinanceReports = () => {
 
       // Update the endpoint URL to match backend route
       const response = await fetch(
-        `/api/v1/admin/reports/finance?type=${selectedReportType}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
+        getApiUrl(`/api/v1/admin/reports/finance?type=${selectedReportType}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -91,7 +92,7 @@ const FinanceReports = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:5000/api/v1/admin/reports/finance/export?type=${selectedReportType}&startDate=${startDate}&endDate=${endDate}`,
+        getApiUrl(`/api/v1/admin/reports/finance/export?type=${selectedReportType}&startDate=${startDate}&endDate=${endDate}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`

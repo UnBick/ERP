@@ -29,6 +29,7 @@ import {
 import { CloudUpload, CloudDownload, Preview } from '@mui/icons-material';
 import * as XLSX from 'xlsx';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../config/apiConfig';
 
 const StyledBox = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -143,7 +144,7 @@ const Grading = () => {
   const fetchExamTypes = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/grading/exam-types', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/grading/exam-types'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -178,7 +179,7 @@ const Grading = () => {
 
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            `http://localhost:5000/api/v1/teacher/grading/students?classId=${selectedClass}&sectionId=${selectedSection}`,
+            getApiUrl(`/api/v1/teacher/grading/students?classId=${selectedClass}&sectionId=${selectedSection}`),
             {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -220,7 +221,7 @@ const Grading = () => {
   const fetchTeacherRole = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/grading/teacher-role', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/grading/teacher-role'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -294,7 +295,7 @@ const Grading = () => {
         autoPublish: examConfig.autoPublish
       };
 
-      const response = await fetch('/api/teacher/grades', {
+      const response = await fetch(getApiUrl('/api/teacher/grades'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(gradeData),
@@ -411,7 +412,7 @@ const Grading = () => {
   const fetchSections = async (classId) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/v1/teacher/grading/sections/${classId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/teacher/grading/sections/${classId}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -442,7 +443,7 @@ const Grading = () => {
   const fetchSubjectsForClass = async (classId) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/v1/teacher/subjects/${classId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/teacher/subjects/${classId}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

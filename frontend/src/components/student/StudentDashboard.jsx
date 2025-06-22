@@ -52,6 +52,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../config/apiConfig';
 
 // Add styled components
 const DashboardWrapper = styled(Box)(({ theme }) => ({
@@ -140,7 +141,7 @@ const StudentDashboard = () => {
       console.log('Fetching dashboard data...'); // Debug log
 
       // Updated endpoint
-      const response = await fetch('http://localhost:5000/api/v1/student/dashboard', {
+      const response = await fetch(getApiUrl('/api/v1/student/dashboard'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -216,7 +217,7 @@ const StudentDashboard = () => {
       const token = localStorage.getItem('authToken');  // Changed from 'token' to 'authToken'
       if (!token) throw new Error('Authentication token not found');
 
-      const response = await fetch('http://localhost:5000/api/v1/student/dashboard', {
+      const response = await fetch(getApiUrl('/api/v1/student/dashboard'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -245,7 +246,7 @@ const StudentDashboard = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/v1/auth/logout', {
+      const response = await fetch(getApiUrl('/api/v1/auth/logout'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

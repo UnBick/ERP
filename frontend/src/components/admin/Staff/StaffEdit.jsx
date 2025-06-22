@@ -22,6 +22,7 @@ import {
   TableCell,
   Checkbox,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const StaffEdit = ({ onBack }) => {
   const [tabValue, setTabValue] = useState(0);
@@ -36,7 +37,7 @@ const StaffEdit = ({ onBack }) => {
 
   const handleBulkUpdate = async () => {
     try {
-      const response = await fetch('/api/admin/staff/bulk-update', {
+      const response = await fetch(getApiUrl('/api/admin/staff/bulk-update'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

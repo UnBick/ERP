@@ -22,6 +22,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { QrCodeScanner, CloudUpload, Assessment } from '@mui/icons-material';
 import { useStudent } from '../Students/context/StudentContext'; // Import useStudent context hook
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Add necessary imports for MUI X DatePickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -53,7 +54,7 @@ const StaffAttendance = () => {
   const fetchDepartments = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/departments', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/departments'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -82,7 +83,7 @@ const StaffAttendance = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/staff/department/${selectedDepartment}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff/department/${selectedDepartment}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -143,7 +144,7 @@ const StaffAttendance = () => {
       }));
 
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/attendance/mark', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/attendance/mark'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +189,7 @@ const StaffAttendance = () => {
   const handleBiometricScan = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/attendance/biometric-scan', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/attendance/biometric-scan'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -230,7 +231,7 @@ const StaffAttendance = () => {
 
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/attendance/bulk-upload', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/attendance/bulk-upload'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -273,7 +274,7 @@ const StaffAttendance = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const encodedDept = encodeURIComponent(selectedDepartment);
-      const response = await fetch(`/api/v1/admin/staff/attendance/statistics?department=${encodedDept}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff/attendance/statistics?department=${encodedDept}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

@@ -27,6 +27,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Subjects = () => {
   const [subjects, setSubjects] = useState([]);
@@ -48,7 +49,7 @@ const Subjects = () => {
   const fetchSubjects = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/admin/academic/subjects', {
+      const response = await fetch(getApiUrl('/api/v1/admin/academic/subjects'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -97,7 +98,7 @@ const Subjects = () => {
   const handleDeleteSubject = async (subjectId) => {
     if (window.confirm('Are you sure you want to delete this subject?')) {
       try {
-        const response = await fetch(`/api/v1/admin/academic/subjects/${subjectId}`, {
+        const response = await fetch(getApiUrl(`/api/v1/admin/academic/subjects/${subjectId}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

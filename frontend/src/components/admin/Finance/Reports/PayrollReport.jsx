@@ -4,6 +4,7 @@ import MonthlyReport from '../../Reports/Payroll/MonthlyReport';
 import YearlyReport from '../../Reports/Payroll/YearlyReport';
 import IndividualReport from '../../Reports/Payroll/IndividualReport';
 import { payrollService } from '../../../../services/payrollService';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const PayrollReport = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -26,7 +27,7 @@ const PayrollReport = () => {
   useEffect(() => {
     const fetchStaffList = async () => {
       try {
-        const response = await fetch('/api/v1/admin/staff', {
+        const response = await fetch(getApiUrl('/api/v1/admin/staff'), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -66,7 +67,7 @@ const PayrollReport = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/v1/admin/finance/payroll/reports/staff/${staffId}`,
+        getApiUrl(`/api/v1/admin/finance/payroll/reports/staff/${staffId}`),
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -104,7 +105,7 @@ const PayrollReport = () => {
   const handleDownloadIndividual = async (staffId, month, year) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/admin/finance/payroll/reports/download/individual/${staffId}?month=${month}&year=${year}`,
+        getApiUrl(`/api/v1/admin/finance/payroll/reports/download/individual/${staffId}?month=${month}&year=${year}`),
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

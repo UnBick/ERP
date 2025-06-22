@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const slotsPerDay = 6;
@@ -21,7 +22,7 @@ const Timetable = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await fetch('/api/v1/admin/classes', {
+        const response = await fetch(getApiUrl('/api/v1/admin/classes'), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -49,7 +50,7 @@ const Timetable = () => {
         return;
       }
       try {
-        const response = await fetch(`/api/v1/admin/sections/class/${selectedClass}`, {
+        const response = await fetch(getApiUrl(`/api/v1/admin/sections/class/${selectedClass}`), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -77,7 +78,7 @@ const Timetable = () => {
         return;
       }
       try {
-        const response = await fetch('/api/v1/admin/academic/subjects', {
+        const response = await fetch(getApiUrl('/api/v1/admin/academic/subjects'), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -171,7 +172,7 @@ const Timetable = () => {
 
   const getQualifiedTeachers = async (subject) => {
     try {
-      const response = await fetch(`/api/v1/teacher/teachers-by-subject?subject=${encodeURIComponent(subject)}`, {
+      const response = await fetch(getApiUrl(`/api/v1/teacher/teachers-by-subject?subject=${encodeURIComponent(subject)}`), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

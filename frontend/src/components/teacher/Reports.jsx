@@ -18,6 +18,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import { getApiUrl } from '../../config/apiConfig';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -44,7 +45,7 @@ const Reports = () => {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/teacher/reports');
+      const response = await fetch(getApiUrl('/api/teacher/reports'));
       const data = await response.json();
       setReports(data);
     } catch (error) {
@@ -64,7 +65,7 @@ const Reports = () => {
         templateId: getTemplateIdForReportType(reportType), // Add template selection
       };
 
-      const response = await fetch('/api/v1/teacher/generate-report', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/generate-report'), {
         method: 'POST',
         body: JSON.stringify(requestBody),
         headers: {

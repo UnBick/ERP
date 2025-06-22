@@ -21,6 +21,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { Delete, Edit, Add } from '@mui/icons-material';
+import { getApiUrl } from '../../config/apiConfig';
 
 const SyllabusTemplates = ({ open, onClose, onSelect }) => {
   const [templates, setTemplates] = useState([]);
@@ -33,8 +34,8 @@ const SyllabusTemplates = ({ open, onClose, onSelect }) => {
     // Fetch categories and permissions from the server
     const fetchData = async () => {
       try {
-        const categoriesResponse = await fetch('/api/syllabus/categories');
-        const permissionsResponse = await fetch('/api/syllabus/permissions');
+        const categoriesResponse = await fetch(getApiUrl('/api/v1/syllabus/categories'));
+        const permissionsResponse = await fetch(getApiUrl('/api/v1/syllabus/permissions'));
         setCategories(await categoriesResponse.json());
         setPermissions(await permissionsResponse.json());
       } catch (error) {
@@ -53,7 +54,7 @@ const SyllabusTemplates = ({ open, onClose, onSelect }) => {
     const formData = new FormData();
     formData.append('template', file);
     try {
-      const response = await fetch('/api/syllabus/templates/import', {
+      const response = await fetch(getApiUrl('/api/v1/syllabus/templates/import'), {
         method: 'POST',
         body: formData
       });
@@ -66,7 +67,7 @@ const SyllabusTemplates = ({ open, onClose, onSelect }) => {
 
   const handleShareTemplate = async (templateId, users) => {
     try {
-      await fetch(`/api/syllabus/templates/${templateId}/share`, {
+      await fetch(getApiUrl(`/api/v1/syllabus/templates/${templateId}/share`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ users })

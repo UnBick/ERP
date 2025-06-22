@@ -27,6 +27,7 @@ import {
 import { Add, Delete, Edit, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Grades = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const Grades = () => {
 
   const fetchGrades = async () => {
     try {
-      const response = await axios.get('/api/exams/exam-grades');
+      const response = await axios.get(getApiUrl('/api/v1/exams/exam-grades'));
       setGrades(response.data?.data || []);
     } catch (error) {
       console.error('Error fetching grades:', error);
@@ -78,9 +79,9 @@ const Grades = () => {
       };
 
       if (currentGrade.id) {
-        await axios.put(`/api/exams/exam-grades/${currentGrade.id}`, gradeData);
+        await axios.put(getApiUrl(`/api/v1/exams/exam-grades/${currentGrade.id}`), gradeData);
       } else {
-        await axios.post('/api/exams/exam-grades', gradeData);
+        await axios.post(getApiUrl('/api/v1/exams/exam-grades'), gradeData);
       }
       await fetchGrades();
       setOpenDialog(false);
@@ -101,7 +102,7 @@ const Grades = () => {
 
   const handleDeleteGrade = async (id) => {
     try {
-      await axios.delete(`/api/exams/exam-grades/${id}`);
+      await axios.delete(getApiUrl(`/api/v1/exams/exam-grades/${id}`));
       fetchGrades();
     } catch (error) {
       console.error('Error deleting grade:', error);

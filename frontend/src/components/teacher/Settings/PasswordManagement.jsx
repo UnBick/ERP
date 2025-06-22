@@ -15,6 +15,7 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const PasswordManagement = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -38,7 +39,7 @@ const PasswordManagement = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/settings/password', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/settings/password'), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

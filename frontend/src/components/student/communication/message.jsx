@@ -28,6 +28,7 @@ import {
     EmojiEmotions
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Update MessageContainer with student-specific colors
 const MessageContainer = styled(Box)(({ theme }) => ({
@@ -209,7 +210,7 @@ const Message = () => {
             console.log('Fetching teachers...');
             
             const response = await fetch(
-                'http://localhost:5000/api/v1/student/communication/teachers',
+                getApiUrl('/api/v1/student/communication/teachers'),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -278,7 +279,7 @@ const Message = () => {
             setLoadingMessages(true);
             const token = localStorage.getItem('authToken');
             const response = await fetch(
-                `http://localhost:5000/api/v1/student/communication/messages/${teacherId}`,
+                getApiUrl(`/api/v1/student/communication/messages/${teacherId}`),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -320,7 +321,7 @@ const Message = () => {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:5000/api/v1/student/communication/send', {
+            const response = await fetch(getApiUrl('/api/v1/student/communication/send'), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -370,7 +371,7 @@ const Message = () => {
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    const response = await fetch('http://localhost:5000/api/v1/upload', {
+                    const response = await fetch(getApiUrl('/api/v1/upload'), {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('authToken')}`

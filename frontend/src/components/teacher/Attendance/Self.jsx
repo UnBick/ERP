@@ -32,6 +32,7 @@ import {
   History
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Add styled components
 const AttendanceWrapper = styled(Box)(({ theme }) => ({
@@ -142,7 +143,7 @@ const SelfAttendance = () => {
   const fetchAttendanceHistory = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/self/history', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/attendance/self/history'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -174,7 +175,7 @@ const SelfAttendance = () => {
   const fetchAttendanceStats = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/self/stats', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/attendance/self/stats'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -203,7 +204,7 @@ const SelfAttendance = () => {
         }
 
         const token = localStorage.getItem('authToken');
-        const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/self/mark', {
+        const response = await fetch(getApiUrl('/api/v1/teacher/attendance/self/mark'), {
             method: 'POST',
             headers: { 
                 'Authorization': `Bearer ${token}`,
@@ -247,7 +248,7 @@ const SelfAttendance = () => {
   const handleLeaveRequest = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/leave/request', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/attendance/leave/request'), {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,

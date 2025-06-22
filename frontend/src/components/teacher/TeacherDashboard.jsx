@@ -38,6 +38,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useTeacher } from '../../context/TeacherContext';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../config/apiConfig';
 
 // Styled components
 const DashboardContainer = styled(Box)(({ theme }) => ({

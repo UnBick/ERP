@@ -22,6 +22,8 @@ import {
 import { Edit, Close, Add, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const ExamManage = () => {
   const navigate = useNavigate();
@@ -46,9 +48,9 @@ const ExamManage = () => {
         console.log('Starting API calls...');
         
         const [classesResponse, subjectsResponse, examTypesResponse] = await Promise.all([
-          axios.get('/api/exams/classes'),
-          axios.get('/api/exams/subjects'),
-          axios.get('/api/exams')
+          axios.get(getApiUrl('/api/v1/exams/classes')),
+          axios.get(getApiUrl('/api/v1/exams/subjects')),
+          axios.get(getApiUrl('/api/v1/exams'))
         ]);
 
         console.log('Exam Types Response:', examTypesResponse.data);

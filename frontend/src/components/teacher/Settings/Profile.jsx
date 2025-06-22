@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material';
 import { useTeacher } from '../../../context/TeacherContext';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -54,7 +55,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/teacher/profile', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/profile'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -102,7 +103,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/teacher/profile', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/profile'), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -157,7 +158,7 @@ const Profile = () => {
       formData.append('avatar', file);
 
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/profile', {
+      const response = await fetch(getApiUrl('/api/v1/teacher/profile'), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`

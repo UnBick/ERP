@@ -19,6 +19,7 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const FinanceReports = () => {
   const [financeReports, setFinanceReports] = useState([]);  // Initialize as empty array
@@ -45,7 +46,7 @@ const FinanceReports = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/financeReports?type=${selectedReportType}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/financeReports?type=${selectedReportType}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

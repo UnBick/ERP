@@ -20,6 +20,7 @@ import {
   DialogActions
 } from '@mui/material';
 import { generateQuestions } from '../../../services/aiService';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const AssignmentGenerator = () => {
   const [loading, setLoading] = useState(false);

@@ -24,6 +24,7 @@ import {
   CardContent,
 } from '@mui/material';
 import { Print, FilterList, ViewWeek, ViewDay } from '@mui/icons-material';
+import { getApiUrl } from '../../config/apiConfig';
 
 const ClassSchedule = () => {
   const [schedule, setSchedule] = useState([]);
@@ -43,7 +44,7 @@ const ClassSchedule = () => {
   const fetchSchedule = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/teacher/schedule');
+      const response = await fetch(getApiUrl('/api/teacher/schedule'));
       const data = await response.json();
       setSchedule(data);
     } catch (error) {

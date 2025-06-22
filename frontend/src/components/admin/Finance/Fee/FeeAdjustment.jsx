@@ -25,6 +25,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const FeeAdjustments = () => {
   const [feeAdjustments, setFeeAdjustments] = useState([]);
@@ -47,7 +48,7 @@ const FeeAdjustments = () => {
   const fetchFeeAdjustments = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/feeAdjustments');
+      const response = await fetch(getApiUrl('/api/admin/feeAdjustments'));
       const data = await response.json();
       setFeeAdjustments(data);
     } catch (error) {
@@ -59,7 +60,7 @@ const FeeAdjustments = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('/api/admin/students');
+      const response = await fetch(getApiUrl('/api/admin/students'));
       const data = await response.json();
       setStudents(data);
     } catch (error) {
@@ -116,7 +117,7 @@ const FeeAdjustments = () => {
     if (window.confirm('Are you sure you want to delete this fee adjustment?')) {
       setLoading(true);
       try {
-        await fetch(`/api/admin/feeAdjustments/${adjustmentId}`, {
+        await fetch(getApiUrl(`/api/admin/feeAdjustments/${adjustmentId}`), {
           method: 'DELETE',
         });
 
