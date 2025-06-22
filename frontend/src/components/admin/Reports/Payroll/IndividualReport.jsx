@@ -37,6 +37,7 @@ const IndividualReport = () => {
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [staffList, setStaffList] = useState([]);
+  const [error, setError] = useState(null);
 
   // Generate years array (current year and 4 previous years)
   const years = Array.from(
@@ -69,6 +70,7 @@ const IndividualReport = () => {
   const handleGenerateReport = async () => {
     if (!selectedStaff || !selectedYear) return;
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(
         getApiUrl(`/api/v1/admin/finance/payroll/reports/staff/${selectedStaff}?year=${selectedYear}`),
@@ -80,13 +82,17 @@ const IndividualReport = () => {
       );
       const result = await response.json();
       console.log('Staff report data:', result);
-      
+
       if (result.success) {
         setReportData(result.data);
         setDialogOpen(true);
+      } else {
+        setReportData(null);
+        setError(result.message || 'Staff not found');
       }
     } catch (error) {
       console.error('Error fetching staff report:', error);
+      setError('Error fetching staff report');
     } finally {
       setLoading(false);
     }
@@ -141,6 +147,12 @@ const IndividualReport = () => {
           {loading ? <CircularProgress size={24} /> : 'Generate Report'}
         </Button>
       </Box>
+
+      {error && (
+        <Box sx={{ mb: 2 }}>
+          <Typography color="error">{error}</Typography>
+        </Box>
+      )}
 
       <Dialog
         open={dialogOpen}
