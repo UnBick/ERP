@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import { payrollService } from '../../../../../src/services/payrollService';
 import { Download } from '@mui/icons-material';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../../../config/apiConfig';
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
