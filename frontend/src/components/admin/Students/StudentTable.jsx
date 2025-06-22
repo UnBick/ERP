@@ -40,6 +40,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Grid from '@mui/material/Grid';
 import StudentEdit from './StudentEdit';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StudentTable = ({ onBack }) => {
   const navigate = useNavigate();
@@ -152,7 +154,7 @@ const StudentTable = ({ onBack }) => {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       
       // Fetch classes
-      const classResponse = await fetch('/api/v1/admin/academic/classes', {
+      const classResponse = await fetch(getApiUrl('/api/v1/admin/academic/classes'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -171,7 +173,7 @@ const StudentTable = ({ onBack }) => {
       }
 
       // Fetch sections
-      const sectionResponse = await fetch('/api/v1/admin/academic/sections', {
+      const sectionResponse = await fetch(getApiUrl('/api/v1/admin/academic/sections'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -208,8 +210,8 @@ const StudentTable = ({ onBack }) => {
   const handleExport = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/students/export', {
-        headers: { 
+      const response = await fetch(getApiUrl('/api/v1/admin/students/export'), {
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }

@@ -25,6 +25,8 @@ import {
   Checkbox,
   FormControlLabel, // Add this import
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StudentEdit = ({ onBack, studentId, initialData }) => {
   const [tabValue, setTabValue] = useState(0);
@@ -71,7 +73,7 @@ const StudentEdit = ({ onBack, studentId, initialData }) => {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       console.log('Fetching student data for ID:', studentId);
 
-      const response = await fetch(`/api/v1/admin/students/${studentId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/students/${studentId}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -106,7 +108,7 @@ const StudentEdit = ({ onBack, studentId, initialData }) => {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       
       // Fetch classes
-      const classResponse = await fetch('/api/v1/admin/academic/classes', {
+      const classResponse = await fetch(getApiUrl('/api/v1/admin/academic/classes'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -118,7 +120,7 @@ const StudentEdit = ({ onBack, studentId, initialData }) => {
       }
 
       // Fetch sections
-      const sectionResponse = await fetch('/api/v1/admin/academic/sections', {
+      const sectionResponse = await fetch(getApiUrl('/api/v1/admin/academic/sections'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -140,7 +142,7 @@ const StudentEdit = ({ onBack, studentId, initialData }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/students/${studentId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/students/${studentId}`), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -201,7 +203,7 @@ const StudentEdit = ({ onBack, studentId, initialData }) => {
       
       console.log('Making search request with query:', cleanQuery);
 
-      const response = await fetch(`/api/v1/admin/students/search?query=${encodedQuery}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/students/search?query=${encodedQuery}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -259,7 +261,7 @@ const StudentEdit = ({ onBack, studentId, initialData }) => {
       };
 
       // Make the bulk update API call
-      const response = await fetch('/api/v1/admin/students/bulk-update', {
+      const response = await fetch(getApiUrl('/api/v1/admin/students/bulk-update'), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

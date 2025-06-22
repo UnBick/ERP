@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import { CloudUpload, Save, Preview } from '@mui/icons-material';
 import { read, utils } from 'xlsx';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const StaffNew = ({ onBack }) => {
   const [tabValue, setTabValue] = useState(0);
@@ -64,7 +65,7 @@ const StaffNew = ({ onBack }) => {
   const handleManualSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/staff/new', {
+      const response = await fetch(getApiUrl('/api/admin/staff/new'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ const StaffNew = ({ onBack }) => {
     setLoading(true);
     try {
       const validData = importedData.filter(staff => staff.isValid);
-      const response = await fetch('/api/admin/staff/bulk-import', {
+      const response = await fetch(getApiUrl('/api/admin/staff/bulk-import'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

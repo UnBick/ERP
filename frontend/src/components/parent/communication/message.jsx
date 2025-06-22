@@ -34,6 +34,8 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 // Styled Components
 const MessageContainer = styled(Box)(({ theme }) => ({
@@ -114,7 +116,7 @@ const message = () => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                'http://localhost:5000/api/v1/parent/communication/teachers',
+                getApiUrl('/api/v1/parent/communication/teachers'),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -139,7 +141,7 @@ const message = () => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `http://localhost:5000/api/v1/parent/communication/messages/${teacherId}`,
+                getApiUrl(`/api/v1/parent/communication/messages/${teacherId}`),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -173,7 +175,7 @@ const message = () => {
             });
 
             await axios.post(
-                'http://localhost:5000/api/v1/parent/communication/send',
+                getApiUrl('/api/v1/parent/communication/send'),
                 formData,
                 {
                     headers: {

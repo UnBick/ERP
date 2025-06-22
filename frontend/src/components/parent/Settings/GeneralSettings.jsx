@@ -1,6 +1,7 @@
 // src/components/parent/Settings/GeneralSettings.jsx
 import React, { useState, useEffect } from 'react';
 import { Box, Paper, Typography, TextField, Button, CircularProgress, Snackbar, Alert, Select, MenuItem, Switch, FormGroup, FormControlLabel } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const GeneralSettings = () => {
   const [settings, setSettings] = useState({ email: '', phoneNumber: '' });
@@ -36,7 +37,7 @@ const GeneralSettings = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/parent/generalSettings');
+      const response = await fetch(getApiUrl('/api/v1/parent/generalSettings'));
       const data = await response.json();
       setSettings(data);
     } catch (error) {
@@ -49,7 +50,7 @@ const GeneralSettings = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/parent/generalSettings', {
+      const response = await fetch(getApiUrl('/api/v1/parent/generalSettings'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),

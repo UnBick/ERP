@@ -23,6 +23,8 @@ import {
 import { Download, Print, Share } from '@mui/icons-material';
 import { useStudent } from '../Students/context/StudentContext'; // Reusing context for simplicity
 import { formatDateTime } from '../../../utils/dateUtils';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StaffReports = () => {
   const { currentUser } = useStudent();
@@ -49,7 +51,7 @@ const StaffReports = () => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/staff/generate-report?type=${reportType}&period=${reportPeriod}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff/generate-report?type=${reportType}&period=${reportPeriod}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -86,7 +88,7 @@ const StaffReports = () => {
 
       console.log('Downloading report:', { reportId, format }); // Debug log
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/staff/reports/${reportId}/download?format=${format}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff/reports/${reportId}/download?format=${format}`), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -113,7 +115,7 @@ const StaffReports = () => {
 
   const handleShare = async (reportId) => {
     try {
-      const response = await fetch(`/api/admin/staff/reports/${reportId}/share`, {
+      const response = await fetch(getApiUrl(`/api/admin/staff/reports/${reportId}/share`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -11,6 +11,8 @@ import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StudentPromotion = ({ onBack }) => {
   const [students, setStudents] = useState([]);
@@ -41,8 +43,8 @@ const StudentPromotion = ({ onBack }) => {
       
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       console.log('Fetching promotion-eligible students...');
-      
-      const response = await fetch('/api/v1/admin/students/promotion-eligible', {
+
+      const response = await fetch(getApiUrl('/api/v1/admin/students/promotion-eligible'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -99,7 +101,7 @@ const StudentPromotion = ({ onBack }) => {
 
   const fetchNextClassSections = async () => {
     try {
-      const response = await fetch('/api/v1/admin/classes/sections');
+      const response = await fetch(getApiUrl('/api/v1/admin/classes/sections'));
       const data = await response.json();
       setSections(data);
     } catch (error) {
@@ -109,7 +111,7 @@ const StudentPromotion = ({ onBack }) => {
 
   const fetchSectionCapacity = async () => {
     try {
-      const response = await fetch('/api/v1/admin/classes/section-capacity');
+      const response = await fetch(getApiUrl('/api/v1/admin/classes/section-capacity'));
       const data = await response.json();
       setSectionCapacity(data);
     } catch (error) {
@@ -135,7 +137,7 @@ const StudentPromotion = ({ onBack }) => {
         ...data
       }));
 
-      const response = await fetch('/api/v1/admin/students/promote', {
+      const response = await fetch(getApiUrl('/api/v1/admin/students/promote'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

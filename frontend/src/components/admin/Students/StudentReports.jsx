@@ -36,6 +36,8 @@ import { useStudent } from './context/StudentContext';
 import { getPdfTemplate } from '../../../utils/reportTemplates';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { generatePDF } from '../../../utils/PDFReportGenerator';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const ReportCard = ({ onClose, onGenerate }) => {
   // Report Card states and handlers
@@ -64,7 +66,7 @@ const ReportCard = ({ onClose, onGenerate }) => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('/api/admin/templates?type=REPORT_CARD');
+      const response = await fetch(getApiUrl('/api/v1/admin/templates?type=REPORT_CARD'));
       const data = await response.json();
       setTemplates(data);
     } catch (error) {
@@ -74,7 +76,7 @@ const ReportCard = ({ onClose, onGenerate }) => {
 
   const fetchClasses = async () => {
     try {
-      const response = await fetch('/api/admin/classes');
+      const response = await fetch(getApiUrl('/api/v1/admin/classes'));
       const data = await response.json();
       setClasses(data);
     } catch (error) {
@@ -84,7 +86,7 @@ const ReportCard = ({ onClose, onGenerate }) => {
 
   const fetchSections = async (classId) => {
     try {
-      const response = await fetch(`/api/admin/sections?classId=${classId}`);
+      const response = await fetch(getApiUrl(`/api/v1/admin/sections?classId=${classId}`));
       const data = await response.json();
       setSections(data);
     } catch (error) {
@@ -94,7 +96,7 @@ const ReportCard = ({ onClose, onGenerate }) => {
 
   const fetchStudents = async (classId, sectionId) => {
     try {
-      const response = await fetch(`/api/admin/students?classId=${classId}&sectionId=${sectionId}`);
+      const response = await fetch(getApiUrl(`/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}`));
       const data = await response.json();
       setStudents(data);
     } catch (error) {

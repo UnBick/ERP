@@ -22,6 +22,8 @@ import {
     Chip
 } from '@mui/material';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const Attendance = () => {
     const [loading, setLoading] = useState(false);
@@ -47,7 +49,7 @@ const Attendance = () => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                'http://localhost:5000/api/v1/parent/children',
+                getApiUrl('/api/v1/parent/children'),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -75,7 +77,7 @@ const Attendance = () => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `http://localhost:5000/api/v1/parent/attendance/${studentId}`,
+                getApiUrl(`/api/v1/parent/attendance/${studentId}`),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -101,7 +103,7 @@ const Attendance = () => {
             console.log('Fetching stats for student:', studentId);
             
             const response = await axios.get(
-                `http://localhost:5000/api/v1/parent/attendance/${studentId}/stats`,
+                getApiUrl(`/api/v1/parent/attendance/${studentId}/stats`),
                 {
                     headers: { 
                         'Authorization': `Bearer ${token}`,

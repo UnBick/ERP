@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const AddStudent = () => {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ console.log("Token being sent:", token);
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/admin/students', {
+      const response = await fetch(getApiUrl('/api/v1/admin/students'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -20,6 +20,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Download as DownloadIcon, Print as PrintIcon } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const ParentPredefineSyllabus = () => {
   const [progressData, setProgressData] = useState({});
@@ -42,7 +43,7 @@ const ParentPredefineSyllabus = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/parent/children');
+      const response = await fetch(getApiUrl('/api/v1/parent/children'));
       const data = await response.json();
       setChildren(data);
       if (data.length > 0) {
@@ -60,7 +61,7 @@ const ParentPredefineSyllabus = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/parent/syllabus-progress/${selectedChild}`);
+      const response = await fetch(getApiUrl(`/api/v1/parent/syllabus-progress/${selectedChild}`));
       const data = await response.json();
       setProgressData(data);
     } catch (error) {
@@ -85,7 +86,7 @@ const ParentPredefineSyllabus = () => {
 
   const handleExportPDF = async () => {
     try {
-      const response = await fetch(`/api/parent/syllabus-export/${selectedChild}?format=pdf`);
+      const response = await fetch(getApiUrl(`/api/v1/parent/syllabus-export/${selectedChild}?format=pdf`));
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

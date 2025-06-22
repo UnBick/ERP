@@ -21,6 +21,8 @@ import {
   Tab,
 } from '@mui/material';
 import { Visibility, Download, Upload, PictureAsPdf, Image } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StaffDocuments = ({ onBack }) => {
   const [documents, setDocuments] = useState([]);
@@ -51,7 +53,7 @@ const StaffDocuments = ({ onBack }) => {
     formData.append('type', documentType);
 
     try {
-      const response = await fetch('/api/admin/staff/documents/upload', {
+      const response = await fetch(getApiUrl('/api/admin/staff/documents/upload'), {
         method: 'POST',
         body: formData,
       });
@@ -63,7 +65,7 @@ const StaffDocuments = ({ onBack }) => {
 
   const handleFileView = async (docId) => {
     try {
-      const response = await fetch(`/api/admin/staff/documents/${docId}/view`);
+      const response = await fetch(getApiUrl(`/api/admin/staff/documents/${docId}/view`));
       const blob = await response.blob();
       window.open(URL.createObjectURL(blob));
     } catch (error) {

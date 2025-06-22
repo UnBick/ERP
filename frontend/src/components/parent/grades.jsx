@@ -23,6 +23,8 @@ import {
 } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const Grades = () => {
     const [loading, setLoading] = useState(false);
@@ -46,7 +48,7 @@ const Grades = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                'http://localhost:5000/api/v1/parent/children',
+                getApiUrl('/api/v1/parent/children'),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -73,7 +75,7 @@ const Grades = () => {
             console.log('Fetching grades for student:', selectedStudent);
             
             const response = await axios.get(
-                `http://localhost:5000/api/v1/parent/grades/${selectedStudent}`,
+                getApiUrl(`/api/v1/parent/grades/${selectedStudent}`),
                 {
                     headers: { 
                         'Authorization': `Bearer ${token}` 
@@ -106,7 +108,7 @@ const Grades = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `/api/v1/parent/grades/${selectedStudent}/report/${examId}`,
+                getApiUrl(`/api/v1/parent/grades/${selectedStudent}/report/${examId}`),
                 {
                     headers: { 
                         'Authorization': `Bearer ${token}`,

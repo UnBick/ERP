@@ -28,6 +28,8 @@ import {
 } from '@mui/material';
 import { Search, Book, History, QrCodeScanner } from '@mui/icons-material';
 import { useAuth } from '../../../contexts/AuthContext';  // Update import
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StaffLibrary = () => {
   const { user } = useAuth();  // Use Auth context instead of Student context
@@ -64,7 +66,7 @@ const StaffLibrary = () => {
       });
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/library/books?${queryParams}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/library/books?${queryParams}`), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -93,7 +95,7 @@ const StaffLibrary = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/library/issued-books', {
+      const response = await fetch(getApiUrl('/api/v1/admin/library/issued-books'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -223,7 +225,7 @@ const StaffLibrary = () => {
   const handlePayFine = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/library/pay-fine', {
+      const response = await fetch(getApiUrl('/api/v1/library/pay-fine'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -257,7 +259,7 @@ const StaffLibrary = () => {
   const fetchRecommendations = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/library/recommendations', {
+      const response = await fetch(getApiUrl('/api/v1/admin/library/recommendations'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

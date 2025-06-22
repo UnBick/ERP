@@ -30,6 +30,8 @@ import {
   Notifications,
   Timer,
 } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
@@ -69,7 +71,7 @@ const BusTracking = () => {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        'http://localhost:5000/api/v1/parent/transport/bus-location',
+        getApiUrl('/api/v1/parent/transport/bus-location'),
         {
           headers: {
             'Authorization': `Bearer ${token}`

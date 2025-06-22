@@ -27,6 +27,8 @@ import StaffTable from './StaffTable';
 import StaffEdit from './StaffEdit';
 import StaffNew from './StaffNew';
 import StaffDocuments from './StaffDocuments';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StaffList = () => {
   const [selectedView, setSelectedView] = useState(null);
@@ -48,7 +50,7 @@ const StaffList = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/staff/dashboard-stats', {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff/dashboard-stats'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -92,7 +94,7 @@ const StaffList = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(`/api/v1/admin/staff?${queryString}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff?${queryString}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -130,17 +132,17 @@ const StaffList = () => {
       switch (action) {
         case 'delete':
           config.method = 'DELETE';
-          response = await fetch(`/api/v1/admin/staff/${staffId}`, config);
+          response = await fetch(getApiUrl(`/api/v1/admin/staff/${staffId}`), config);
           break;
         case 'update':
           config.method = 'PUT';
           config.body = JSON.stringify(data);
-          response = await fetch(`/api/v1/admin/staff/${staffId}`, config);
+          response = await fetch(getApiUrl(`/api/v1/admin/staff/${staffId}`), config);
           break;
         case 'create':
           config.method = 'POST';
           config.body = JSON.stringify(data);
-          response = await fetch('/api/v1/admin/staff', config);
+          response = await fetch(getApiUrl('/api/v1/admin/staff'), config);
           break;
         default:
           throw new Error('Invalid action');

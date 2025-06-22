@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Add, Download } from '@mui/icons-material';
 import { useStudent } from './context/StudentContext';
+import { getApiUrl } from '../../../config/apiConfig';
 import {
   Timeline,
   TimelineItem,
@@ -59,8 +60,8 @@ const Examinations = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const type = tabs[activeTab].toLowerCase().split(' ')[0]; // Get 'upcoming', 'past', etc.
-      
-      const response = await fetch(`/api/v1/admin/examinations?type=${type}`, {
+
+      const response = await fetch(getApiUrl(`/api/v1/admin/examinations?type=${type}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -82,7 +83,7 @@ const Examinations = () => {
 
   const handleExportResults = async (examId) => {
     try {
-      const response = await fetch(`/api/v1/admin/examinations/${examId}/export`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/examinations/${examId}/export`), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -103,7 +104,7 @@ const Examinations = () => {
   const handleScheduleExam = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/examinations/schedule', {
+      const response = await fetch(getApiUrl('/api/v1/admin/examinations/schedule'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +227,7 @@ const Examinations = () => {
 
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/examinations/results/upload', {
+      const response = await fetch(getApiUrl('/api/v1/admin/examinations/results/upload'), {
         method: 'POST',
         body: formData,
         headers: {

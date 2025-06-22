@@ -45,6 +45,7 @@ import { useStudent } from './context/StudentContext';
 import { LocationService } from '../../../services/LocationService';
 import { calculateETA, optimizeRoute } from '../../../utils/transportUtils';
 import { transportNotificationService } from '../../../services/TransportNotificationService';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Update this with your actual Google Maps API key from environment variables
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
@@ -111,13 +112,13 @@ const StudentTransport = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const [busesResponse, stopsResponse] = await Promise.all([
-        fetch('/api/v1/admin/transport/buses', {
+        fetch(getApiUrl('/api/v1/admin/transport/buses'), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }),
-        fetch('/api/v1/admin/transport/stops', {
+        fetch(getApiUrl('/api/v1/admin/transport/stops'), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -217,7 +218,7 @@ const StudentTransport = () => {
   const updateBusLocation = async (busId, location) => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/transport/location/${busId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/transport/location/${busId}`), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -299,7 +300,7 @@ const StudentTransport = () => {
   const handleAlertSettingsUpdate = async (newSettings) => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/transport/alerts', {
+      const response = await fetch(getApiUrl('/api/v1/admin/transport/alerts'), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -326,7 +327,7 @@ const StudentTransport = () => {
   const fetchRouteHistory = async (busId, date) => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/transport/history?busId=${busId}&date=${date}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/transport/history?busId=${busId}&date=${date}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

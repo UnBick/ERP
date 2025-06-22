@@ -20,6 +20,8 @@ import StudentTable from './StudentTable';
 import StudentEdit from './StudentEdit';
 import StudentPromotion from './StudentPromotion';
 import AddStudent from './AddStudent';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const DashboardStats = ({ stats }) => {
   return (
@@ -89,7 +91,7 @@ const StudentList = () => {
   const fetchDashboardStats = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/students/dashboard-stats', {
+      const response = await fetch(getApiUrl('/api/v1/admin/students/dashboard-stats'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

@@ -33,8 +33,8 @@ const LoginForm = () => {
   
     try {
       const userData = { identifier: admissionNumber, password };
-  
-      const response = await fetch(getApiUrl('/auth/login'), {  // Updated endpoint path
+
+      const response = await fetch(getApiUrl('/api/v1/auth/login'), {  // Updated endpoint path
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/send-otp', {
+      const response = await fetch(getApiUrl('/api/v1/auth/send-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),
@@ -117,7 +117,7 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/verify-otp', {
+      const response = await fetch(getApiUrl('/api/v1/auth/verify-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp }),

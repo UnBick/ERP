@@ -20,6 +20,7 @@ import {
   CardContent,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const ParentBooks = () => {
   const [readingHistory, setReadingHistory] = useState([]);
@@ -44,7 +45,7 @@ const ParentBooks = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/parent/reading-history');
+      const response = await fetch(getApiUrl('/api/v1/parent/reading-history'));
       const data = await response.json();
       setReadingHistory(data);
     } catch (error) {
@@ -57,7 +58,7 @@ const ParentBooks = () => {
 
   const fetchRecommendations = async () => {
     try {
-      const response = await fetch('/api/parent/book-recommendations');
+      const response = await fetch(getApiUrl('/api/v1/parent/book-recommendations'));
       const data = await response.json();
       setRecommendations(data);
     } catch (error) {
@@ -67,7 +68,7 @@ const ParentBooks = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await fetch('/api/parent/reading-analytics');
+      const response = await fetch(getApiUrl('/api/v1/parent/reading-analytics'));
       const data = await response.json();
       setAnalytics(data);
     } catch (error) {
