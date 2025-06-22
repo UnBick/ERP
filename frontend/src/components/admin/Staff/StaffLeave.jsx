@@ -28,10 +28,7 @@ import {
 import { CloudUpload, Assessment } from '@mui/icons-material';
 import { useStudent } from '../Students/context/StudentContext'; // Reusing context for simplicity
 import { getApiUrl } from '../../../config/apiConfig';
-<<<<<<< HEAD
 
-=======
->>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
 
 const StaffLeave = () => {
   const { currentUser } = useStudent();
