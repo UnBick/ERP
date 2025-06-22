@@ -30,6 +30,7 @@ import {
   RadioButtonUnchecked,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const TemplateList = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const TemplateList = () => {
 
   const fetchTemplates = async (type) => {
     try {
-      const response = await fetch(`/api/v1/settings/templates/type/${type}`, {
+      const response = await fetch(getApiUrl(`/api/v1/settings/templates/type/${type}`), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -125,7 +126,7 @@ const TemplateList = () => {
 
   const handleSetActive = async (templateId, docType) => {
     try {
-      const response = await fetch('/api/v1/settings/templates/set-active', {
+      const response = await fetch(getApiUrl('/api/v1/settings/templates/set-active'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

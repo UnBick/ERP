@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { CheckCircle, Cancel, RadioButtonUnchecked, Save } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Add styled components
 const AttendanceWrapper = styled(Box)(({ theme }) => ({
@@ -85,7 +86,7 @@ const StudentAttendance = () => {
     setLoading(true);
     try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/students', {
+        const response = await fetch(getApiUrl('/api/v1/teacher/attendance/students'), {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -119,7 +120,7 @@ const StudentAttendance = () => {
 const checkAccess = async () => {
     try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/teacher-role', {
+        const response = await fetch(getApiUrl('/api/v1/teacher/attendance/teacher-role'), {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -165,7 +166,7 @@ const checkAccess = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/teacher/attendance/student', { // Updated endpoint
+      const response = await fetch(getApiUrl('/api/v1/teacher/attendance/student'), { // Updated endpoint
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

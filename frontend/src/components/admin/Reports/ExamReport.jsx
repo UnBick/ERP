@@ -29,6 +29,7 @@ import {
   Divider,
 } from '@mui/material';
 import { saveAs } from 'file-saver';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const ExamReports = () => {
   const [examReports, setExamReports] = useState([]);
@@ -76,7 +77,7 @@ const ExamReports = () => {
   const fetchClasses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/v1/admin/classes', {
+      const response = await fetch(getApiUrl('/api/v1/admin/classes'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -108,7 +109,7 @@ const ExamReports = () => {
   const fetchSections = async (classId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/v1/admin/classes/${classId}/sections`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/classes/${classId}/sections`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -152,7 +153,7 @@ const ExamReports = () => {
       console.log('Fetching exam reports with params:', Object.fromEntries(params));
 
       const response = await fetch(
-        `http://localhost:5000/api/v1/admin/reports/exams?${params}`,
+        getApiUrl(`/api/v1/admin/reports/exams?${params}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`,

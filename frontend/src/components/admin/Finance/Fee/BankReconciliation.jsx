@@ -15,6 +15,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const BankReconciliation = () => {
   const [reconciliations, setReconciliations] = useState([]);
@@ -29,7 +30,7 @@ const BankReconciliation = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/reconciliations', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/reconciliations'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

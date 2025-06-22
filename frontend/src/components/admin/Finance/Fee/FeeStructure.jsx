@@ -38,6 +38,7 @@ import {
   Assessment,
   DirectionsBus,
 } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Add API base URL constant
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
@@ -45,7 +46,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 // Add helper for API calls
 const fetchWithAuth = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
-  const baseUrl = 'http://localhost:5000'; // Add explicit base URL
+  const baseUrl = getApiUrl(); // Add explicit base URL
 
   try {
     const response = await fetch(`${baseUrl}${endpoint}`, {

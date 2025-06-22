@@ -16,6 +16,7 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const GeneralSettings = () => {
   const [settings, setSettings] = useState({
@@ -44,7 +45,7 @@ const GeneralSettings = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/student/settings');
+      const response = await fetch(getApiUrl('/api/student/settings'));
       const data = await response.json();
       setSettings(data);
     } catch (error) {
@@ -57,7 +58,7 @@ const GeneralSettings = () => {
   const handleUpdateSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/student/settings', {
+      const response = await fetch(getApiUrl('/api/student/settings'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

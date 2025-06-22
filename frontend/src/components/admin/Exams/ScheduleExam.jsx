@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const ScheduleExam = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const ScheduleExam = () => {
 
   const fetchExamTypes = async () => {
     try {
-      const response = await axios.get('/api/exams');
+      const response = await axios.get(getApiUrl('/api/v1/exams'));
       console.log('Exam types response:', response.data);
 
       if (response.data.success) {
@@ -72,7 +73,7 @@ const ScheduleExam = () => {
   const handleClassChange = async (classId) => {
     try {
       setSelectedClass(classId);
-      const response = await axios.get(`/api/subjects/${classId}`);
+      const response = await axios.get(getApiUrl(`/api/v1/subjects/${classId}`));
       const subjectsWithSchedule = response.data.map(subject => {
         const exception = selectedExam.exceptions.find(e => e.subject === subject.id);
         return {
@@ -104,7 +105,7 @@ const ScheduleExam = () => {
         endTime: new Date(selectedTime.getTime() + item.duration * 60000)
       }));
 
-      const response = await axios.post('/api/exam-schedule', {
+      const response = await axios.post(getApiUrl('/api/v1/exam-schedule'), {
         examId: selectedExam.id,
         classId: selectedClass,
         schedule: formattedSchedule

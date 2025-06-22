@@ -11,6 +11,7 @@ import {
   Box
 } from '@mui/material';
 
+
 const MarksPreview = ({ data }) => {
   if (!data || data.length === 0) return null;
 

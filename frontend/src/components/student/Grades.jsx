@@ -15,6 +15,7 @@ import {
   Alert,
   Button,
 } from '@mui/material';
+import { getApiUrl } from '../../config/apiConfig';
 
 const Grades = () => {
   const [grades, setGrades] = useState([]);
@@ -42,7 +43,7 @@ const Grades = () => {
 
   const fetchPublishedGrades = async () => {
     try {
-      const response = await fetch('/api/student/published-grades');
+      const response = await fetch(getApiUrl('/api/student/published-grades'));
       const data = await response.json();
       setPublishedGrades(data);
     } catch (error) {
@@ -53,7 +54,7 @@ const Grades = () => {
   const handleDownloadReport = async (examId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/student/grade-report/${examId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/student/grade-report/${examId}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

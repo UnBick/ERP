@@ -29,6 +29,7 @@ import {
     Edit,
     Delete
 } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Sections = () => { 
     const [sections, setSections] = useState([]);
@@ -45,7 +46,7 @@ const Sections = () => {
 
     const fetchClasses = async () => { 
         try { 
-            const response = await fetch('/api/v1/admin/academic/classes', { 
+            const response = await fetch(getApiUrl('/api/v1/admin/academic/classes'), { 
                 headers: { 
                     'Authorization': `Bearer ${localStorage.getItem('token')}`, 
                     'Content-Type': 'application/json' 
@@ -66,7 +67,7 @@ const Sections = () => {
     const fetchSections = async () => { 
         setLoading(true);
         try { 
-            const response = await fetch('/api/v1/admin/sections', { 
+            const response = await fetch(getApiUrl('/api/v1/admin/sections'), { 
                 headers: { 
                     'Authorization': `Bearer ${localStorage.getItem('token')}`, 
                     'Content-Type': 'application/json' 
@@ -108,7 +109,7 @@ const Sections = () => {
     const handleDeleteSection = async (sectionId) => { 
         if (window.confirm('Are you sure you want to delete this section?')) { 
             try { 
-                const response = await fetch(`/api/v1/admin/academic/sections/${sectionId}`, { 
+                const response = await fetch(getApiUrl(`/api/v1/admin/academic/sections/${sectionId}`), { 
                     method: 'DELETE', 
                     headers: { 
                         'Authorization': `Bearer ${localStorage.getItem('token')}` 

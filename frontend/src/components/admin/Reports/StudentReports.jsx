@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/lab';
 import { saveAs } from 'file-saver';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const StudentReports = () => {
   const [studentReports, setStudentReports] = useState([]); // Initialize as empty array
@@ -39,7 +40,7 @@ const StudentReports = () => {
   const fetchClasses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/classes', {
+      const response = await fetch(getApiUrl('/api/v1/admin/classes'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -84,7 +85,7 @@ const StudentReports = () => {
       const formattedEndDate = endDate.toISOString().split('T')[0];
 
       const response = await fetch(
-        `/api/v1/admin/studentReports?classId=${selectedClass}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
+        getApiUrl(`/api/v1/admin/studentReports?classId=${selectedClass}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`,

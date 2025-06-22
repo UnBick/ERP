@@ -17,6 +17,7 @@ import {
   TextField,
   Button,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const PendingFees = () => {
   const [pendingFees, setPendingFees] = useState([]);
@@ -40,7 +41,7 @@ const PendingFees = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/pending', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/pending'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ const PendingFees = () => {
     setLoadingLateFees(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/penalties', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/penalties'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

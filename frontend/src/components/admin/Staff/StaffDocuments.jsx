@@ -22,7 +22,10 @@ import {
 } from '@mui/material';
 import { Visibility, Download, Upload, PictureAsPdf, Image } from '@mui/icons-material';
 import { getApiUrl } from '../../../config/apiConfig';
+<<<<<<< HEAD
 
+=======
+>>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
 
 const StaffDocuments = ({ onBack }) => {
   const [documents, setDocuments] = useState([]);

@@ -27,6 +27,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Results = () => {
   // State declarations
@@ -57,7 +58,7 @@ const Results = () => {
   const fetchExaminations = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/exams/examinations');
+      const response = await axios.get(getApiUrl('/api/v1/exams/examinations'));
       if (response.data.success) {
         const transformedExams = response.data.data.map(exam => ({
           id: exam._id,
@@ -79,7 +80,7 @@ const Results = () => {
 
   const fetchExamDetails = async (examId) => {
     try {
-      const response = await axios.get(`/api/exams/examinations/${examId}`);
+      const response = await axios.get(getApiUrl(`/api/v1/exams/examinations/${examId}`));
       if (response.data.success) {
         const examDetails = response.data.data;
         setClasses(examDetails.applicableClasses.map(cls => ({
@@ -97,7 +98,7 @@ const Results = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/admin/marks/${selectedExam}/${selectedClass}/${selectedSection}/${selectedSubject}`
+        getApiUrl(`/api/v1/admin/marks/${selectedExam}/${selectedClass}/${selectedSection}/${selectedSubject}`)
       );
       const data = await response.json();
       if (data && Object.keys(data).length > 0) {
@@ -148,8 +149,8 @@ const Results = () => {
       setLoading(true);
       try {
         const [sectionsRes, subjectsRes] = await Promise.all([
-          axios.get(`/api/exams/classes/${classId}/sections`),
-          axios.get(`/api/exams/classes/${classId}/subjects`)
+          axios.get(getApiUrl(`/api/v1/exams/classes/${classId}/sections`)),
+          axios.get(getApiUrl(`/api/v1/exams/classes/${classId}/subjects`))
         ]);
 
         if (sectionsRes.data.success) {
@@ -177,8 +178,8 @@ const Results = () => {
       setLoading(true);
       try {
         const [studentsResponse, subjectsResponse] = await Promise.all([
-          axios.get(`/api/exams/classes/${selectedClass}/sections/${sectionId}/students`),
-          axios.get(`/api/exams/subjects`)
+          axios.get(getApiUrl(`/api/v1/exams/classes/${selectedClass}/sections/${sectionId}/students`)),
+          axios.get(getApiUrl(`/api/v1/exams/subjects`))
         ]);
 
         if (studentsResponse.data.success) {
@@ -266,7 +267,7 @@ const Results = () => {
   const handleSaveMarks = async () => {
     setLoading(true);
     try {
-      await fetch('/api/admin/marks', {
+      await fetch(getApiUrl('/api/v1/admin/marks'), {
         method: existingMarks ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -26,6 +26,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import { Upload as UploadIcon, Sort as SortIcon } from '@mui/icons-material';
+import { getApiUrl } from '../../config/apiConfig';
 
 const Assignments = () => {
   const [assignments, setAssignments] = useState([]);
@@ -44,7 +45,7 @@ const Assignments = () => {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/student/assignments');
+      const response = await fetch(getApiUrl('/api/v1/student/assignments'));
       const data = await response.json();
       setAssignments(data);
     } catch (error) {
@@ -60,7 +61,7 @@ const Assignments = () => {
     formData.append('file', submission.file);
 
     try {
-      await fetch(`/api/student/assignments/${assignmentId}/submit`, {
+      await fetch(getApiUrl(`/api/v1/student/assignments/${assignmentId}/submit`), {
         method: 'POST',
         body: formData,
       });

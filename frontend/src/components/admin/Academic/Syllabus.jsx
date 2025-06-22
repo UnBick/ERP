@@ -9,6 +9,7 @@ import {
   Snackbar, Alert
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const SyllabusManagement = () => {
   const [syllabi, setSyllabi] = useState([]);
@@ -33,7 +34,7 @@ const SyllabusManagement = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await fetch('/api/admin/academic/classes', {
+      const response = await fetch(getApiUrl('/api/admin/academic/classes'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -51,7 +52,7 @@ const SyllabusManagement = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await fetch('/api/admin/academic/subjects', {
+      const response = await fetch(getApiUrl('/api/admin/academic/subjects'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -70,7 +71,7 @@ const SyllabusManagement = () => {
   const fetchSyllabi = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/academic/syllabi', {
+      const response = await fetch(getApiUrl('/api/admin/academic/syllabi'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -152,7 +153,7 @@ const SyllabusManagement = () => {
   const handleDeleteSyllabus = async (syllabusId) => {
     if (window.confirm('Are you sure you want to delete this syllabus?')) {
       try {
-        const response = await fetch(`/api/admin/academic/syllabi/${syllabusId}`, {
+        const response = await fetch(getApiUrl(`/api/admin/academic/syllabi/${syllabusId}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

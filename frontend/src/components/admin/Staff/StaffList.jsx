@@ -21,6 +21,7 @@ import {
   Assessment,
   School
 } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Import components
 import StaffTable from './StaffTable';

@@ -17,6 +17,8 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import FeeCollectionDialog from './FeeCollectionDialog';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const FeeCollection = () => {
   const [feeCollections, setFeeCollections] = useState([]);
@@ -33,7 +35,7 @@ const FeeCollection = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/collections', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/collections'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -123,7 +125,7 @@ const FeeCollection = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/fees/collections/${feeCollectionId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/fees/collections/${feeCollectionId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

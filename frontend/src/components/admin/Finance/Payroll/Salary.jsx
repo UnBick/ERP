@@ -24,8 +24,9 @@ import {
   MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = getApiUrl();
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);

@@ -20,7 +20,8 @@ import {
   CloudDownload, 
   Schedule 
 } from '@mui/icons-material';
-
+import { getApiUrl } from '../../../config/apiConfig';
+const API_BASE_URL = getApiUrl('/api/v1/admin');
 const Backup = () => {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);

@@ -25,6 +25,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const FeeWaivers = () => {
   const [feeWaivers, setFeeWaivers] = useState([]);
@@ -48,7 +49,7 @@ const FeeWaivers = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/waivers', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/waivers'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ const FeeWaivers = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('/api/v1/admin/students');
+      const response = await fetch(getApiUrl('/api/v1/admin/students'));
       const data = await response.json();
       setStudents(data);
     } catch (error) {
@@ -156,7 +157,7 @@ const FeeWaivers = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/admin/fees/waivers/${waiverId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/fees/waivers/${waiverId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

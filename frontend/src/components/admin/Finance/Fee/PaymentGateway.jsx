@@ -22,6 +22,7 @@ import {
   Alert,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Gateway configuration details
 const GATEWAY_CONFIGS = {
@@ -84,7 +85,7 @@ const PaymentGateway = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/payment-gateways', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/payment-gateways'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -118,7 +119,7 @@ const PaymentGateway = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/admin/fees/payment-gateways', {
+      const response = await fetch(getApiUrl('/api/v1/admin/fees/payment-gateways'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

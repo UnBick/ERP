@@ -20,6 +20,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { NotificationsActive, Preview } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState({
@@ -56,7 +57,7 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/student/notifications');
+      const response = await fetch(getApiUrl('/api/student/notifications'));
       const data = await response.json();
       setNotifications(data);
     } catch (error) {
@@ -69,7 +70,7 @@ const Notifications = () => {
   const handleSaveNotifications = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/student/notifications', {
+      const response = await fetch(getApiUrl('/api/student/notifications'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

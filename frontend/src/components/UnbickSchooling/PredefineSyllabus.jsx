@@ -29,6 +29,7 @@ import {
 } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
 import './PredefineSyllabus.css'; // Add your custom styles here
+import { getApiUrl } from '../../config/apiConfig';
 
 const PredefineSyllabus = ({ role }) => {
   const [syllabuses, setSyllabuses] = useState([]);
@@ -57,7 +58,7 @@ const PredefineSyllabus = ({ role }) => {
 
   const handleVersioning = async (syllabusId) => {
     try {
-      const response = await fetch(`/api/syllabus/${syllabusId}/versions`);
+      const response = await fetch(getApiUrl(`/api/v1/syllabus/${syllabusId}/versions`));
       const data = await response.json();
       setVersions(data);
     } catch (error) {
@@ -67,7 +68,7 @@ const PredefineSyllabus = ({ role }) => {
 
   const handleRestoreVersion = async (versionId) => {
     try {
-      const response = await fetch(`/api/syllabus/version/${versionId}/restore`, {
+      const response = await fetch(getApiUrl(`/api/v1/syllabus/version/${versionId}/restore`), {
         method: 'POST'
       });
       if (!response.ok) throw new Error('Failed to restore version');
@@ -79,7 +80,7 @@ const PredefineSyllabus = ({ role }) => {
 
   const handleAddComment = async (syllabusId, comment) => {
     try {
-      const response = await fetch('/api/syllabus/comments', {
+      const response = await fetch(getApiUrl('/api/v1/syllabus/comments'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ syllabusId, comment })
@@ -134,10 +135,10 @@ const PredefineSyllabus = ({ role }) => {
     // Fetch syllabus, versions, collaborators, and comments from the server
     const fetchData = async () => {
       try {
-        const syllabusResponse = await axios.get('/api/predefinesyllabus/syllabus');
-        const versionsResponse = await axios.get('/api/predefinesyllabus/versions');
-        const collaboratorsResponse = await axios.get('/api/predefinesyllabus/collaborators');
-        const commentsResponse = await axios.get('/api/predefinesyllabus/comments');
+        const syllabusResponse = await axios.get(getApiUrl('/api/v1/predefinesyllabus/syllabus'));
+        const versionsResponse = await axios.get(getApiUrl('/api/v1/predefinesyllabus/versions'));
+        const collaboratorsResponse = await axios.get(getApiUrl('/api/v1/predefinesyllabus/collaborators'));
+        const commentsResponse = await axios.get(getApiUrl('/api/v1/predefinesyllabus/comments'));
         setSyllabuses(syllabusResponse.data);
         setVersions(versionsResponse.data);
         setCollaborators(collaboratorsResponse.data);

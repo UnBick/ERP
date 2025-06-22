@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
 import axios from 'axios';
+import { getApiUrl } from '../../config/apiConfig';
 
 const Message = ({ userRole }) => {
     const [recipients, setRecipients] = useState([]);
@@ -34,7 +35,7 @@ const Message = ({ userRole }) => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `http://localhost:5000/api/v1/messages/recipients/${role}`,
+                getApiUrl(`/api/v1/messages/recipients/${role}`),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -65,7 +66,7 @@ const Message = ({ userRole }) => {
 
             const token = localStorage.getItem('authToken');
             const response = await axios.post(
-                'http://localhost:5000/api/v1/messages/send',
+                getApiUrl('/api/v1/messages/send'),
                 {
                     recipientId: selectedRecipient,
                     recipientRole: selectedRole,

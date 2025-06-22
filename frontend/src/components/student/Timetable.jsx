@@ -41,6 +41,7 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { getApiUrl } from '../../config/apiConfig';
 
 const Timetable = () => {
   const [timetable, setTimetable] = useState([]);
@@ -62,7 +63,7 @@ const Timetable = () => {
   const fetchTimetable = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/student/timetable');
+      const response = await fetch(getApiUrl('/api/v1/student/timetable'));
       const data = await response.json();
       setTimetable(data);
     } catch (error) {
@@ -74,7 +75,7 @@ const Timetable = () => {
 
   const handleDownload = async (format) => {
     try {
-      const response = await fetch(`/api/student/timetable/export?format=${format}`);
+      const response = await fetch(getApiUrl(`/api/v1/student/timetable/export?format=${format}`));
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -88,7 +89,7 @@ const Timetable = () => {
 
   const toggleReminders = async () => {
     try {
-      await fetch('/api/student/timetable/notifications', {
+      await fetch(getApiUrl('/api/v1/student/timetable/notifications'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !remindersEnabled }),

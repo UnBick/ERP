@@ -13,6 +13,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const TeacherPredefineSyllabus = () => {
   const [editDialog, setEditDialog] = useState(false);
@@ -29,7 +30,7 @@ const TeacherPredefineSyllabus = () => {
 
   const handleProgressUpdate = async (topicId, progress) => {
     try {
-      await fetch(`/api/teacher/syllabus/progress/${topicId}`, {
+      await fetch(getApiUrl(`/api/teacher/syllabus/progress/${topicId}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ progress })

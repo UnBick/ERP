@@ -30,6 +30,7 @@ import {
     EmojiEmotions
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Update MessageContainer styling with gradient background
 const MessageContainer = styled(Box)(({ theme }) => ({
@@ -336,7 +337,7 @@ const Message = () => {
             setRecipients([]); // Clear existing recipients while loading
             const token = localStorage.getItem('authToken');
             const response = await fetch(
-                `http://localhost:5000/api/v1/teacher/communication/recipients?type=${recipientType}`,
+                getApiUrl(`/api/v1/teacher/communication/recipients?type=${recipientType}`),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -377,7 +378,7 @@ const Message = () => {
             setLoadingMessages(true);
             const token = localStorage.getItem('authToken');
             const response = await fetch(
-                `http://localhost:5000/api/v1/teacher/communication/messages/${recipientId}`,
+                getApiUrl(`/api/v1/teacher/communication/messages/${recipientId}`),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -446,7 +447,7 @@ const Message = () => {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:5000/api/v1/teacher/communication/send', {
+            const response = await fetch(getApiUrl('/api/v1/teacher/communication/send'), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -501,7 +502,7 @@ const Message = () => {
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    const response = await fetch('http://localhost:5000/api/v1/upload', {
+                    const response = await fetch(getApiUrl('/api/v1/upload'), {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('authToken')}`

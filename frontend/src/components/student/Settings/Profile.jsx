@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { PhotoCamera, Edit } from '@mui/icons-material';
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -77,7 +78,7 @@ const Profile = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/student/settings/profile', {
+      const response = await fetch(getApiUrl('/api/v1/student/settings/profile'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -105,7 +106,7 @@ const Profile = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/student/settings/profile', {
+      const response = await fetch(getApiUrl('/api/v1/student/settings/profile'), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -150,7 +151,7 @@ const Profile = () => {
     formData.append('avatar', file);
     
     try {
-      const response = await fetch('/api/student/profile/avatar', {
+      const response = await fetch(getApiUrl('/api/v1/student/profile/avatar'), {
         method: 'POST',
         body: formData
       });

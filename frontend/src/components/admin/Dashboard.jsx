@@ -140,7 +140,7 @@ const AdminDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             if (!token) throw new Error('No authentication token found');
-            const response = await fetch(getApiUrl(`/admin/dashboard?range=${timeRange}`), {
+            const response = await fetch(getApiUrl(`/api/v1/admin/dashboard?range=${timeRange}`), {
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 credentials: 'include'
             });

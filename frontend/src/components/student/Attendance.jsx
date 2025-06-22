@@ -26,6 +26,7 @@ import {
 } from '@mui/material';
 import { CalendarMonth as CalendarIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../config/apiConfig';
 
 // Add styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -130,7 +131,7 @@ const Attendance = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/student/attendance', {
+      const response = await fetch(getApiUrl('/api/v1/student/attendance'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -155,7 +156,7 @@ const Attendance = () => {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/student/attendance/stats', {
+      const response = await fetch(getApiUrl('/api/v1/student/attendance/stats'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -178,7 +179,7 @@ const Attendance = () => {
   const submitLeaveRequest = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/v1/student/attendance/leave-request', {
+      const response = await fetch(getApiUrl('/api/v1/student/attendance/leave-request')  , {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
