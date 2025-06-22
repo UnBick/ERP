@@ -32,7 +32,7 @@ const LoginForm = () => {
     setLoading(true);
   
     try {
-      const userData = { identifier, password };
+      const userData = { identifier: admissionNumber, password };
   
       const response = await fetch(getApiUrl('/auth/login'), {  // Updated endpoint path
         method: 'POST',
