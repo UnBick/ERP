@@ -1,23 +1,31 @@
 const app = require('./app');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 8080;
 
-// Enable CORS middleware
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    
-    if (req.method === 'OPTIONS') {
-        return res.status(200).json({});
-    }
-    next();
-});
+// ✅ Enable CORS middleware (replacing manual headers)
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://unbick-erp.up.railway.app'
+];
 
-// Error handling middleware
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow Postman/curl (no origin) and allowed web origins
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+}));
+
+// ✅ Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -27,6 +35,7 @@ app.use((err, req, res, next) => {
     });
 });
 
+// ✅ MongoDB connection and server start
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('Connected to MongoDB');
