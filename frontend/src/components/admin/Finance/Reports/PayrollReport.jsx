@@ -4,7 +4,7 @@ import MonthlyReport from '../../Reports/Payroll/MonthlyReport';
 import YearlyReport from '../../Reports/Payroll/YearlyReport';
 import IndividualReport from '../../Reports/Payroll/IndividualReport';
 import { payrollService } from '../../../../services/payrollService';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../../../config/apiConfig';
 
 const PayrollReport = () => {
   const [activeTab, setActiveTab] = useState(0);

@@ -38,7 +38,7 @@ import {
   Assessment,
   DirectionsBus,
 } from '@mui/icons-material';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../../../config/apiConfig';
 
 // Add API base URL constant
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';

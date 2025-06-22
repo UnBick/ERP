@@ -24,7 +24,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../../../config/apiConfig';
 
 const API_BASE_URL = getApiUrl();
 

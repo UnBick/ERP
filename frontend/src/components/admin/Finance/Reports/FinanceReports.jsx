@@ -19,7 +19,7 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../../../config/apiConfig';
 
 const FinanceReports = () => {
   const [financeReports, setFinanceReports] = useState([]);  // Initialize as empty array

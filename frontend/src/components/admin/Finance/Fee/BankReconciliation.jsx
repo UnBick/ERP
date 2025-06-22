@@ -15,7 +15,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../../../config/apiConfig';
 
 const BankReconciliation = () => {
   const [reconciliations, setReconciliations] = useState([]);
