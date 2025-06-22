@@ -117,7 +117,7 @@ const StudentTable = ({ onBack }) => {
         queryParams.append('status', filters.status);
       }
 
-      const url = `/api/v1/admin/students?${queryParams.toString()}`;
+      const url = getApiUrl(`/api/v1/admin/students?${queryParams.toString()}`);
       console.log('Fetching URL:', url);
 
       const response = await fetch(url, {
