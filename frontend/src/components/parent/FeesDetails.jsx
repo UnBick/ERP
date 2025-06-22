@@ -4,6 +4,8 @@ import { Box, Typography, CircularProgress, Snackbar, Alert, Table, TableBody, T
 import { CloudDownload, Payment, Receipt, History } from '@mui/icons-material';
 import { PieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';
+import { getApiUrl } from '../../config/apiConfig';
+
 
 const FeesDetails = () => {
   const [feesDetails, setFeesDetails] = useState([]);
@@ -43,7 +45,7 @@ const FeesDetails = () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        'http://localhost:5000/api/v1/parent/children',
+        getApiUrl('/api/v1/parent/children'),
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -69,7 +71,7 @@ const FeesDetails = () => {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        `http://localhost:5000/api/v1/parent/fees/${studentId}`,
+        getApiUrl(`/api/v1/parent/fees/${studentId}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -101,7 +103,7 @@ const FeesDetails = () => {
   const processPayment = async () => {
     try {
       // Initiate payment
-      const initResponse = await axios.post('/api/v1/parent/fees/initiate-payment', {
+      const initResponse = await axios.post(getApiUrl('/api/v1/parent/fees/initiate-payment'), {
         studentId: selectedStudent,
         feeId: selectedFee._id,
         amount: paymentAmount
@@ -112,7 +114,7 @@ const FeesDetails = () => {
       const paymentIntent = initResponse.data.data.paymentIntent;
 
       // Confirm payment
-      await axios.post('/api/v1/parent/fees/confirm-payment', {
+      await axios.post(getApiUrl('/api/v1/parent/fees/confirm-payment'), {
         studentId: selectedStudent,
         feeId: selectedFee._id,
         paymentIntentId: paymentIntent.id,
@@ -131,7 +133,7 @@ const FeesDetails = () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        `http://localhost:5000/api/v1/parent/fees/receipt/${feeId}`,
+        getApiUrl(`/api/v1/parent/fees/receipt/${feeId}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`

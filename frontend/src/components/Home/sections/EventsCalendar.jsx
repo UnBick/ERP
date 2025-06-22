@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ApiService from '../../../utils/ApiService';
 import '../styles/EventsCalendar.css';
+
 const EventsCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState([]);

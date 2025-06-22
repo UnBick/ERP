@@ -36,6 +36,8 @@ import {
 } from 'chart.js';
 import { styled } from '@mui/system';
 import axios from 'axios';
+import { getApiUrl } from '../../config/apiConfig';
+
 
 // Register ChartJS components
 ChartJS.register(
@@ -189,7 +191,7 @@ const StudentProgress = () => {
   const fetchStudentProgress = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/parent/studentProgress');
+      const response = await fetch(getApiUrl('/api/parent/studentProgress'));
       const data = await response.json();
       setProgress(data);
     } catch (error) {
@@ -203,7 +205,7 @@ const StudentProgress = () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        'http://localhost:5000/api/v1/parent/children',
+        getApiUrl('/api/v1/parent/children'),
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
@@ -235,7 +237,7 @@ const StudentProgress = () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        `http://localhost:5000/api/v1/parent/student-progress/${selectedChild}?period=${selectedPeriod}`,
+        getApiUrl(`/api/v1/parent/student-progress/${selectedChild}?period=${selectedPeriod}`),
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
@@ -287,7 +289,7 @@ const StudentProgress = () => {
     try {
       const report = progressData.examResults.find(exam => exam.id === examId);
       if (report.status === 'published') {
-        const response = await fetch(`/api/parent/progress-report/${examId}`);
+        const response = await fetch(getApiUrl(`/api/v1/parent/progress-report/${examId}`));
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

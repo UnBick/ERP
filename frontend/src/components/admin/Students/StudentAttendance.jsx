@@ -22,6 +22,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useStudent } from './context/StudentContext';
+import { getApiUrl } from '../../../config/apiConfig';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -82,7 +84,7 @@ const StudentAttendance = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/academic/classes', {
+      const response = await fetch(getApiUrl('/api/v1/admin/academic/classes'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -111,7 +113,7 @@ const StudentAttendance = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/academic/sections/class/${selectedClass}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/academic/sections/class/${selectedClass}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -138,7 +140,7 @@ const StudentAttendance = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const response = await fetch(
-        `/api/v1/admin/attendance/students?classId=${selectedClass}&sectionId=${selectedSection}`,
+        getApiUrl(`/api/v1/admin/attendance/students?classId=${selectedClass}&sectionId=${selectedSection}`),
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -179,7 +181,7 @@ const StudentAttendance = () => {
   const submitAttendance = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/attendance/submit', {
+      const response = await fetch(getApiUrl('/api/v1/admin/attendance/submit'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 // src/components/parent/Settings/Notifications.jsx
 import React, { useState, useEffect } from 'react';
 import { Box, Paper, Typography, TextField, Button, CircularProgress, Snackbar, Alert } from '@mui/material';
+import { getApiUrl } from '../../../config/apiConfig';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState({ email: '', sms: '' });
@@ -14,7 +15,7 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/parent/notifications');
+      const response = await fetch(getApiUrl('/api/v1/parent/notifications'));
       const data = await response.json();
       setNotifications(data);
     } catch (error) {
@@ -27,7 +28,7 @@ const Notifications = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/parent/notifications', {
+      const response = await fetch(getApiUrl('/api/v1/parent/notifications'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(notifications),

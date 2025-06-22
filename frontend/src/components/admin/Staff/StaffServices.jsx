@@ -27,6 +27,8 @@ import {
   SportsEsports,
 } from '@mui/icons-material';
 import { useStudent } from '../Students/context/StudentContext';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const ServiceCard = ({ title, icon, description, onRequest }) => (
   <Card>
@@ -107,7 +109,7 @@ const StaffServices = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/admin/staff/services/request', {
+      const response = await fetch(getApiUrl('/api/admin/staff/services/request'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

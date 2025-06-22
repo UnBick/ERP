@@ -31,6 +31,8 @@ import {
 } from '@mui/material';
 import { Search, Book, History } from '@mui/icons-material';
 import { useStudent } from './context/StudentContext';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StudentLibrary = () => {
   const { currentUser } = useStudent();
@@ -58,7 +60,7 @@ const StudentLibrary = () => {
   const fetchBooks = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/library/books?search=${searchQuery}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/library/books?search=${searchQuery}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -81,7 +83,7 @@ const StudentLibrary = () => {
   const fetchIssuedBooks = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/library/issued-books', {
+      const response = await fetch(getApiUrl('/api/v1/admin/library/issued-books'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -104,7 +106,7 @@ const StudentLibrary = () => {
   const handleIssueBook = async (bookId) => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/library/issue-book', {
+      const response = await fetch(getApiUrl('/api/v1/admin/library/issue-book'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +136,7 @@ const StudentLibrary = () => {
   const handleReturnBook = async (issueId) => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/library/return-book/${issueId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/library/return-book/${issueId}`), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

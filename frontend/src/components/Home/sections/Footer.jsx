@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import '../styles/Footer.css';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const Footer = () => {
   const defaultData = {
@@ -52,7 +54,7 @@ const Footer = () => {
 
   const fetchContactData = async () => {
     try {
-      const response = await fetch('/api/admin/contact-info');
+      const response = await fetch(getApiUrl('/api/v1/admin/contact-info'));
       const data = await response.json();
       if (data) {
         setContactData(data);

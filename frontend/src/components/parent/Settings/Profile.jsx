@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import { getApiUrl } from '../../../config/apiConfig';
 
 // Styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -432,7 +433,7 @@ const Profile = () => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                'http://localhost:5000/api/v1/parent/settings/profile',
+                getApiUrl('/api/v1/parent/settings/profile'),
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -461,7 +462,7 @@ const Profile = () => {
 
             const token = localStorage.getItem('authToken');
             const response = await axios.post(
-                'http://localhost:5000/api/v1/parent/settings/profile/avatar',
+                getApiUrl('/api/v1/parent/settings/profile/avatar'),
                 formData,
                 {
                     headers: {
@@ -497,7 +498,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `http://localhost:5000/api/v1/parent/settings/profile/${section}`,
+                getApiUrl(`/api/v1/parent/settings/profile/${section}`),
                 data,
                 {
                     headers: { 'Authorization': `Bearer ${token}` }

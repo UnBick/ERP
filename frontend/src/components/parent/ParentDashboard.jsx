@@ -35,6 +35,8 @@ import {
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl } from '../../config/apiConfig';
+
 
 // Styled components
 const DashboardContainer = styled(Box)(({ theme }) => ({
@@ -93,7 +95,7 @@ const ParentDashboard = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/v1/parent/dashboard', {
+      const response = await axios.get(getApiUrl('/api/v1/parent/dashboard'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -138,7 +140,7 @@ const ParentDashboard = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/v1/auth/logout', {
+      const response = await fetch(getApiUrl('/api/v1/auth/logout'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

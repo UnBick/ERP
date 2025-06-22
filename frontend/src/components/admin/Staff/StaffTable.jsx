@@ -30,6 +30,8 @@ import {
   FilterList,
   Search,
 } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StaffTable = ({ onBack }) => {
   const [staff, setStaff] = useState([]); // Initial state is an empty array
@@ -52,7 +54,7 @@ const StaffTable = ({ onBack }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/staff?search=${searchQuery}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/staff?search=${searchQuery}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -107,7 +109,7 @@ const StaffTable = ({ onBack }) => {
 
   const handleExport = async () => {
     try {
-      const response = await fetch('/api/admin/staff/export', {
+      const response = await fetch(getApiUrl('/api/admin/staff/export'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

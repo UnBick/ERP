@@ -22,6 +22,8 @@ import {
 } from '@mui/material';
 import { GoogleMap, LoadScript, Marker, DirectionsRenderer } from '@react-google-maps/api';
 import { DirectionsBus, LocationOn } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const StaffTransport = () => {
   const [selectedRoute, setSelectedRoute] = useState('');
@@ -101,7 +103,7 @@ const StaffTransport = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const stopsResponse = await fetch(`/api/v1/admin/staff/transport/routes/${routeId}/stops`, {
+      const stopsResponse = await fetch(getApiUrl(`/api/v1/admin/staff/transport/routes/${routeId}/stops`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

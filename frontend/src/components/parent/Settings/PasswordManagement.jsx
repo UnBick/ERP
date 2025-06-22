@@ -15,6 +15,8 @@ import {
   Divider,
 } from '@mui/material';
 import { Security, History } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const PasswordManagement = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -37,7 +39,7 @@ const PasswordManagement = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/parent/updatePassword', {
+      const response = await fetch(getApiUrl('/api/v1/parent/updatePassword'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

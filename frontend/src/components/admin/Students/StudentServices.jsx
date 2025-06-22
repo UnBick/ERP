@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import { Download, Description, Badge, Assignment, School } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const DOCUMENT_TYPES = {
   REPORT_CARD: {
@@ -87,7 +89,7 @@ const DocumentGenerationDialog = ({
   const fetchClassData = async () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/settings/documents/class-data', {
+      const response = await fetch(getApiUrl('/api/v1/settings/documents/class-data'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -111,7 +113,7 @@ const DocumentGenerationDialog = ({
   const fetchSections = async (selectedClassId) => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/settings/sections/class/${selectedClassId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/settings/sections/class/${selectedClassId}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -155,7 +157,7 @@ const DocumentGenerationDialog = ({
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const response = await fetch(
-        `/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}`, {
+        getApiUrl(`/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}`), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -380,7 +382,7 @@ const StudentServices = () => {
         console.log(`Processing ${students.length} students`);
 
         // Fetch template
-        const templateResponse = await fetch(`/api/v1/settings/templates/type/${docType}?active=true`, {
+        const templateResponse = await fetch(getApiUrl(`/api/v1/settings/templates/type/${docType}?active=true`), {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json'
@@ -395,7 +397,7 @@ const StudentServices = () => {
         const templateToUse = templateData.data[0];
         
         // For all types of generation, use the same endpoint
-        const response = await fetch('/api/v1/settings/documents/generate-batch', {
+        const response = await fetch(getApiUrl('/api/v1/settings/documents/generate-batch'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -29,6 +29,8 @@ import {
     MarkEmailRead
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 // Styled components for inbox
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -60,8 +62,8 @@ const ParentInbox = () => {
     const fetchMessages = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(
-                'http://localhost:5000/api/v1/parent/communication/inbox',
+            const response = await fetch(getApiUrl(
+                '/api/v1/parent/communication/inbox'),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`

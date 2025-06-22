@@ -11,6 +11,8 @@ import {
   Refresh as PendingIcon,
   Email as EmailIcon
 } from '@mui/icons-material';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const AdmissionManagement = () => {
   const [applications, setApplications] = useState([]);
@@ -35,7 +37,7 @@ const AdmissionManagement = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/admissions/requests?status=${currentTab}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/admissions/requests?status=${currentTab}`), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -65,7 +67,7 @@ const AdmissionManagement = () => {
   const handleStatusUpdate = async (applicationId, newStatus) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/v1/admin/admissions/requests/${applicationId}`, {
+      const response = await fetch(getApiUrl(`/api/v1/admin/admissions/requests/${applicationId}`), {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -97,7 +99,7 @@ const AdmissionManagement = () => {
   const handleBulkAction = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/v1/admin/admissions/bulk-update', {
+      const response = await fetch(getApiUrl('/api/v1/admin/admissions/bulk-update'), {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

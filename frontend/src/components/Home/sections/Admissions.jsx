@@ -20,6 +20,8 @@ import {
   Divider
 } from '@mui/material';
 import FileUploadZone from '../../admin/common/FileUploadZone';
+import { getApiUrl } from '../../../config/apiConfig';
+
 
 const steps = [
   'Student Details',
@@ -84,7 +86,7 @@ const Admissions = () => {
     });
 
     try {
-      const response = await fetch('/api/public/admissions/upload-documents', {
+      const response = await fetch(getApiUrl('/api/v1/public/admissions/upload-documents'), {
         method: 'POST',
         body: formData
       });
@@ -100,7 +102,7 @@ const Admissions = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('/api/public/admissions/submit', {
+      const response = await fetch(getApiUrl('/api/v1/public/admissions/submit'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
