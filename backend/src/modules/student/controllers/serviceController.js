@@ -1,10 +1,11 @@
+// Fixed backend controller with proper frontend alignment
+
 const catchAsync = require('../../../utils/catchAsync');
 const ApiResponse = require('../../../utils/apiResponse');
 const Student = require('../models/studentModel');
 const Class = require('../../academic/models/classModel');
 const Section = require('../../academic/models/sectionModel');
 const PDFDocument = require('pdfkit');
-//const { generateQRCode } = require('../../../utils/qrCodeUtils');
 const { formatDate } = require('../../../utils/dateUtils');
 const path = require('path');
 const fs = require('fs').promises;
@@ -13,22 +14,146 @@ const Result = require('../models/resultModel');
 const DOCUMENT_TYPES = {
     REPORT_CARD: {
         template: 'report-card.pdf',
-        handler: generateReportCard
+        handler: generateReportCard,
+        frontendType: 'reportcard'
     },
     TRANSFER_CERT: {
         template: 'transfer-certificate.pdf',
-        handler: generateTransferCertificate
+        handler: generateTransferCertificate,
+        frontendType: 'certificate'
     },
     ID_CARD: {
         template: 'id-card.pdf',
-        handler: generateIDCard
+        handler: generateIDCard,
+        frontendType: 'idcard'
     },
     CHARACTER_CERT: {
         template: 'character-certificate.pdf',
-        handler: generateCharacterCertificate
+        handler: generateCharacterCertificate,
+        frontendType: 'certificate'
     }
 };
 
+// Add missing endpoint for class data
+exports.getClassData = catchAsync(async (req, res) => {
+  try {
+    const classes = await Class.find({ isActive: true })
+      .select('name')
+      .sort('name');
+    
+    return res.json(ApiResponse.success('Classes retrieved successfully', {
+      classes
+    }));
+  } catch (error) {
+    console.error('Error fetching classes:', error);
+    return res.status(500).json(ApiResponse.error('Failed to fetch classes'));
+  }
+});
+
+// Fixed generateBatch endpoint with proper frontend alignment
+exports.generateBatch = catchAsync(async (req, res) => {
+  try {
+    const { documentType, template, students, outputFormat } = req.body;
+
+    console.log('Generate Batch Request:', {
+      documentType,
+      studentsCount: students?.length || 0,
+      outputFormat,
+      bodySize: req.headers['content-length'] || 'unknown'
+    });
+
+    // Limit batch size to prevent server overload
+    const MAX_BATCH_SIZE = 500;
+    if (students && students.length > MAX_BATCH_SIZE) {
+      return res.status(400).json({
+        success: false,
+        message: `Batch size too large. Maximum allowed is ${MAX_BATCH_SIZE} students per request.`
+      });
+    }
+
+    // Check for very large request body (e.g., >5MB)
+    const MAX_BODY_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+    const contentLength = parseInt(req.headers['content-length'] || '0', 10);
+    if (contentLength > MAX_BODY_SIZE_BYTES) {
+      return res.status(413).json({
+        success: false,
+        message: `Request body too large. Maximum allowed is ${MAX_BODY_SIZE_BYTES / (1024 * 1024)}MB.`
+      });
+    }
+
+    // Validate input
+    if (!documentType || !students || !Array.isArray(students) || students.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request: documentType and students array are required'
+      });
+    }
+
+    // Map frontend document types to backend handlers
+    const backendType = Object.keys(DOCUMENT_TYPES).find(
+      key => DOCUMENT_TYPES[key].frontendType === documentType
+    );
+
+    if (!backendType || !DOCUMENT_TYPES[backendType]) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid document type: ${documentType}`
+      });
+    }
+
+    // Create PDF document
+    const doc = new PDFDocument({ autoFirstPage: false });
+
+    // Set response headers for PDF download
+    const filename = `${documentType}_${outputFormat || 'single'}_${Date.now()}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    // Pipe the PDF to the response
+    doc.pipe(res);
+
+    // Generate document for each student
+    for (const studentWrapper of students) {
+      try {
+        const student = studentWrapper.studentData || studentWrapper;
+        const customData = studentWrapper.customData || {};
+
+        if (DOCUMENT_TYPES[backendType].handler) {
+          await DOCUMENT_TYPES[backendType].handler(
+            doc,
+            student,
+            customData.schoolYear || new Date().getFullYear(),
+            customData
+          );
+        }
+      } catch (error) {
+        console.error(`Error processing student:`, error);
+        doc.addPage();
+        doc.fontSize(12).text(`Error processing student: ${error.message}`, {
+          color: 'red'
+        });
+      }
+    }
+
+    // End the document
+    doc.end();
+
+  } catch (error) {
+    console.error('Batch document generation error:', error);
+    if (error.stack) {
+      console.error(error.stack);
+    }
+    // If headers haven't been sent yet, send JSON error
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Error generating documents'
+      });
+    }
+  }
+});
+
+// Enhanced generateDocument with better error handling
 exports.generateDocument = catchAsync(async (req, res) => {
   try {
     const { documentType, scope, classId, sectionId, studentId, year } = req.body;
@@ -45,7 +170,7 @@ exports.generateDocument = catchAsync(async (req, res) => {
     if (!DOCUMENT_TYPES[documentType]) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid document type'
+        message: `Invalid document type: ${documentType}`
       });
     }
 
@@ -90,7 +215,7 @@ exports.generateDocument = catchAsync(async (req, res) => {
       default:
         return res.status(400).json({
           success: false,
-          message: 'Invalid scope'
+          message: 'Invalid scope. Must be one of: INDIVIDUAL, SECTION, CLASS, SCHOOL'
         });
     }
 
@@ -120,10 +245,9 @@ exports.generateDocument = catchAsync(async (req, res) => {
     const doc = new PDFDocument({ autoFirstPage: false });
     
     // Set response headers
+    const filename = `${documentType.toLowerCase()}_${scope.toLowerCase()}_${Date.now()}.pdf`;
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 
-      `attachment; filename=${documentType.toLowerCase()}_${scope.toLowerCase()}_${Date.now()}.pdf`
-    );
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     
     // Pipe the PDF to the response
     doc.pipe(res);
@@ -132,12 +256,14 @@ exports.generateDocument = catchAsync(async (req, res) => {
     for (const student of students) {
       try {
         if (DOCUMENT_TYPES[documentType].handler) {
-          await DOCUMENT_TYPES[documentType].handler(doc, student, req.body.year);
+          await DOCUMENT_TYPES[documentType].handler(doc, student, year || new Date().getFullYear());
         }
       } catch (error) {
         console.error(`Error processing student ${student._id}:`, error);
         doc.addPage();
-        doc.text(`Error processing student: ${error.message}`);
+        doc.fontSize(12).text(`Error processing student: ${error.message}`, {
+          color: 'red'
+        });
       }
     }
 
@@ -146,44 +272,33 @@ exports.generateDocument = catchAsync(async (req, res) => {
 
   } catch (error) {
     console.error('Document generation error:', error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || 'Error generating document'
-    });
+    
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Error generating document'
+      });
+    }
   }
 });
 
-exports.downloadDocument = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const document = await Document.findById(id);
-  
-  if (!document) {
-    return res.status(404).json(ApiResponse.error('Document not found'));
-  }
-
-  const filePath = path.join(__dirname, '../../../../uploads/documents', document.fileName);
-  res.download(filePath);
-});
-
-exports.getStudentDocuments = catchAsync(async (req, res) => {
-  const { studentId } = req.params;
-  const documents = await Document.find({ student: studentId })
-    .sort('-createdAt');
-
-  return res.json(ApiResponse.success('Documents retrieved successfully', documents));
-});
-
-async function generateReportCard(doc, student, year) {
+// Keep existing functions but update signatures to accept customData
+async function generateReportCard(doc, student, year, customData = {}) {
   try {
     doc.addPage();
 
-    // Add basic details first
+    // Add school info if provided
+    if (customData.schoolName) {
+      doc.fontSize(16).text(customData.schoolName, { align: 'center' });
+      doc.moveDown();
+    }
+
     doc.fontSize(20).text('School Report Card', { align: 'center' });
     doc.moveDown();
     doc.fontSize(14).text('Student Details', { underline: true });
     doc.moveDown();
 
-    // Student Details with null checks
+    // Rest of the existing generateReportCard function...
     const studentDetails = [
       ['Name', `${student?.personalInfo?.firstName || ''} ${student?.personalInfo?.lastName || ''}`],
       ['Class', student?.academicInfo?.class?.name || 'N/A'],
@@ -192,7 +307,6 @@ async function generateReportCard(doc, student, year) {
       ['Academic Year', year || new Date().getFullYear()]
     ];
 
-    // Add student details
     studentDetails.forEach(([label, value]) => {
       doc.fontSize(12).text(`${label}: ${value}`);
       doc.moveDown(0.5);
@@ -201,7 +315,6 @@ async function generateReportCard(doc, student, year) {
     doc.moveDown();
 
     try {
-      // Fetch results with proper error handling
       const results = await Result.find({
         student: student._id,
         academicYear: year
@@ -209,11 +322,9 @@ async function generateReportCard(doc, student, year) {
       .populate('subject')
       .lean();
 
-      // Add results table
       doc.fontSize(14).text('Academic Performance', { underline: true });
       doc.moveDown();
 
-      // Table headers
       const startX = 50;
       const columnWidth = 120;
       
@@ -234,7 +345,6 @@ async function generateReportCard(doc, student, year) {
       doc.moveDown();
       doc.font('Helvetica');
 
-      // If results exist, add them to the table
       if (results && results.length > 0) {
         results.forEach(result => {
           const y = doc.y;
@@ -245,7 +355,6 @@ async function generateReportCard(doc, student, year) {
           doc.moveDown();
         });
 
-        // Add total/percentage
         doc.moveDown();
         const totalMarks = results.reduce((sum, r) => sum + (r.marksObtained || 0), 0);
         const maxMarks = results.reduce((sum, r) => sum + (r.totalMarks || 0), 0);
@@ -272,7 +381,6 @@ async function generateReportCard(doc, student, year) {
       });
     }
 
-    // Add footer
     doc.moveDown(2);
     doc.fontSize(10).text('This is a computer-generated report card.', {
       align: 'center',
@@ -288,15 +396,21 @@ async function generateReportCard(doc, student, year) {
   }
 }
 
-async function generateTransferCertificate(doc, student) {
+// Update other generator functions similarly to accept customData parameter
+async function generateTransferCertificate(doc, student, year, customData = {}) {
+    // Existing implementation with customData integration
     try {
         doc.addPage();
         
-        // Header
+        if (customData.schoolName) {
+            doc.fontSize(16).text(customData.schoolName, { align: 'center' });
+            doc.moveDown();
+        }
+        
         doc.fontSize(18).text('Transfer Certificate', { align: 'center' });
         doc.moveDown();
 
-        // Format dates directly if formatDate is not available
+        // Rest of existing implementation...
         const formatDateFallback = (date) => {
             if (!date) return 'N/A';
             try {
@@ -310,7 +424,6 @@ async function generateTransferCertificate(doc, student) {
             }
         };
 
-        // Certificate Content with null checks
         doc.fontSize(12);
         const studentName = `${student?.personalInfo?.firstName || ''} ${student?.personalInfo?.lastName || ''}`.trim() || 'N/A';
         const rollNo = student?.academicInfo?.rollNumber || 'N/A';
@@ -320,7 +433,6 @@ async function generateTransferCertificate(doc, student) {
         const admissionDate = student?.admissionDate ? formatDateFallback(student.admissionDate) : 'N/A';
         const currentDate = formatDateFallback(new Date());
 
-        // Certificate text
         const certificateText = [
             `This is to certify that ${studentName}`,
             `Roll No: ${rollNo}`,
@@ -329,18 +441,15 @@ async function generateTransferCertificate(doc, student) {
             `from ${admissionDate} to ${currentDate}`
         ];
 
-        // Add each line with proper spacing
         certificateText.forEach(line => {
             doc.text(line);
             doc.moveDown(0.5);
         });
         
-        // Add signature lines
         doc.moveDown(4);
         doc.text('Class Teacher', 50, doc.y);
         doc.text('Principal', 450, doc.y);
 
-        // Add footer
         doc.moveDown(2);
         doc.fontSize(10);
         doc.text('This is a computer-generated certificate.', {
@@ -357,18 +466,19 @@ async function generateTransferCertificate(doc, student) {
     }
 }
 
-async function generateIDCard(doc, student) {
+async function generateIDCard(doc, student, year, customData = {}) {
+    // Existing implementation with customData integration
     try {
-        doc.addPage({ size: [243, 153] }); // Standard ID card size
+        doc.addPage({ size: [243, 153] });
 
-        // School Logo - with error handling
         try {
-            doc.image(path.join(__dirname, '../../../assets/logo.png'), 10, 10, { width: 30 });
+            const logoPath = path.join(__dirname, '../../../assets/logo.png');
+            await fs.access(logoPath);
+            doc.image(logoPath, 10, 10, { width: 30 });
         } catch (error) {
             console.error('Error loading school logo:', error);
         }
         
-        // Student Details with null checks
         doc.fontSize(10);
         const studentName = `${student?.personalInfo?.firstName || ''} ${student?.personalInfo?.lastName || ''}`.trim() || 'N/A';
         const className = student?.academicInfo?.class?.name || 'N/A';
@@ -377,7 +487,6 @@ async function generateIDCard(doc, student) {
         const bloodGroup = student?.personalInfo?.bloodGroup || 'N/A';
         const contact = student?.contactInfo?.phone || student?.parentInfo?.phone || 'N/A';
 
-        // Layout student details
         doc.text(studentName, 10, 50);
         doc.text(`Class: ${className} - ${sectionName}`, 10, 65);
         doc.text(`Roll No: ${rollNo}`, 10, 80);
@@ -386,27 +495,31 @@ async function generateIDCard(doc, student) {
 
     } catch (error) {
         console.error('Error generating ID card:', error);
+        doc.addPage();
         doc.text('Error generating ID card: ' + error.message);
     }
 }
 
-async function generateCharacterCertificate(doc, student) {
+async function generateCharacterCertificate(doc, student, year, customData = {}) {
+    // Existing implementation with customData integration
     try {
         doc.addPage();
 
-        // Header
+        if (customData.schoolName) {
+            doc.fontSize(16).text(customData.schoolName, { align: 'center' });
+            doc.moveDown();
+        }
+
         doc.fontSize(18).text('Character Certificate', { align: 'center' });
         doc.moveDown();
 
-        // Certificate Content with null checks
         const studentName = `${student?.personalInfo?.firstName || ''} ${student?.personalInfo?.lastName || ''}`.trim() || 'N/A';
         const rollNo = student?.academicInfo?.rollNumber || 'N/A';
         const fatherName = student?.parentInfo?.fatherName || student?.contactInfo?.guardianName || 'N/A';
         const className = student?.academicInfo?.class?.name || 'N/A';
         const sectionName = student?.academicInfo?.section?.name || 'N/A';
-        const currentYear = new Date().getFullYear();
+        const currentYear = year || new Date().getFullYear();
 
-        // Certificate text
         doc.fontSize(12);
         const content = `This is to certify that ${studentName}, ` +
             `Roll No. ${rollNo}, son/daughter of ${fatherName} was a student of ` +
@@ -418,7 +531,6 @@ async function generateCharacterCertificate(doc, student) {
             lineGap: 10
         });
 
-        // Signature spaces
         doc.moveDown(4);
         doc.fontSize(11);
         doc.text('Class Teacher', 50, doc.y);
@@ -426,6 +538,7 @@ async function generateCharacterCertificate(doc, student) {
 
     } catch (error) {
         console.error('Error generating character certificate:', error);
+        doc.addPage();
         doc.text('Error generating character certificate: ' + error.message);
     }
 }
