@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE_URL = 'http://localhost:5000/api/v1';
+export const API_BASE_URL = 'https://backend-production-a762.up.railway.app';
 
 export const MESSAGE_ENDPOINTS = {
   SETTINGS: `${API_BASE_URL}/admin/settings/messages`,
@@ -18,7 +18,7 @@ export const API_ENDPOINTS = {
 };
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000',
+    baseURL: 'https://backend-production-a762.up.railway.app',
     headers: {
         'Content-Type': 'application/json'
     },
