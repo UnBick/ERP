@@ -4,7 +4,7 @@ import { Box, Typography, CircularProgress, Snackbar, Alert, Table, TableBody, T
 import { CloudDownload, Payment, Receipt, History } from '@mui/icons-material';
 import { PieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../config/apiConfig';
 
 
 const FeesDetails = () => {

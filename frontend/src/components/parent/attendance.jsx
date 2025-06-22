@@ -22,7 +22,7 @@ import {
     Chip
 } from '@mui/material';
 import axios from 'axios';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../config/apiConfig';
 
 
 const Attendance = () => {

@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import axios from 'axios';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../config/apiConfig';
 
 
 const Grades = () => {

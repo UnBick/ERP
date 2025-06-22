@@ -36,7 +36,7 @@ import {
 } from 'chart.js';
 import { styled } from '@mui/system';
 import axios from 'axios';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../config/apiConfig';
 
 
 // Register ChartJS components

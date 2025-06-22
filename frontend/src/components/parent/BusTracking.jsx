@@ -30,7 +30,7 @@ import {
   Notifications,
   Timer,
 } from '@mui/icons-material';
-import { getApiUrl } from '../../../config/apiConfig';
+import { getApiUrl } from '../../config/apiConfig';
 
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
