@@ -7,6 +7,8 @@ export const API_BASE_URL =
   console.log('[API] Final API_BASE_URL =', API_BASE_URL);
 
 export function getApiUrl(path) {
+  // If no path is provided, just return the base URL
+  if (!path) return API_BASE_URL;
   // Ensure no double slashes
   return `${API_BASE_URL.replace(/\/$/, '')}${path.startsWith('/') ? path : '/' + path}`;
 }

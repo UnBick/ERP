@@ -26,7 +26,8 @@ import {
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { getApiUrl } from '../../../../config/apiConfig';
 
-const API_BASE_URL = getApiUrl();
+// Use getApiUrl with a path argument
+const API_BASE_URL = getApiUrl(); // This is just the base URL
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
@@ -69,7 +70,7 @@ const Salary = () => {
       const token = localStorage.getItem('token');
       console.log('Fetching salaries with token:', token); // Debug log
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/admin/finance/payroll/salaries`, {
+      const response = await fetch(getApiUrl('/api/v1/admin/finance/payroll/salaries'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -109,7 +110,7 @@ const Salary = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/v1/admin/staff`, {
+      const response = await fetch(getApiUrl('/api/v1/admin/staff'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -195,8 +196,8 @@ const Salary = () => {
       const token = localStorage.getItem('token');
       const method = selectedSalary ? 'PUT' : 'POST';
       const baseUrl = selectedSalary
-        ? `${API_BASE_URL}/api/v1/admin/finance/payroll/salaries/${selectedSalary.id}`
-        : `${API_BASE_URL}/api/v1/admin/finance/payroll/salaries`;
+        ? getApiUrl(`/api/v1/admin/finance/payroll/salaries/${selectedSalary.id}`)
+        : getApiUrl('/api/v1/admin/finance/payroll/salaries');
 
       if (salaryDetails.month === 'all') {
         const promises = MONTHS
@@ -281,7 +282,7 @@ const Salary = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/api/v1/admin/finance/payroll/salaries/${salaryId}`, {
+        const response = await fetch(getApiUrl(`/api/v1/admin/finance/payroll/salaries/${salaryId}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
