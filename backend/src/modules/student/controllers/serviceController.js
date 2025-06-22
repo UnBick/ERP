@@ -4,7 +4,6 @@ const Student = require('../models/studentModel');
 const Class = require('../../academic/models/classModel');
 const Section = require('../../academic/models/sectionModel');
 const PDFDocument = require('pdfkit');
-//const { generateQRCode } = require('../../../utils/qrCodeUtils');
 const { formatDate } = require('../../../utils/dateUtils');
 const path = require('path');
 const fs = require('fs').promises;
@@ -28,6 +27,86 @@ const DOCUMENT_TYPES = {
         handler: generateCharacterCertificate
     }
 };
+
+// Add the missing generateBatch endpoint that your frontend is calling
+exports.generateBatch = catchAsync(async (req, res) => {
+  try {
+    const { documentType, template, students, outputFormat } = req.body;
+    
+    console.log('Generate Batch Request:', {
+      documentType,
+      studentsCount: students?.length || 0,
+      outputFormat
+    });
+
+    // Validate input
+    if (!documentType || !students || !Array.isArray(students) || students.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request: documentType and students array are required'
+      });
+    }
+
+    // Map frontend document types to backend handlers
+    const typeMapping = {
+      'reportcard': 'REPORT_CARD',
+      'certificate': documentType === 'transfer' ? 'TRANSFER_CERT' : 'CHARACTER_CERT',
+      'idcard': 'ID_CARD'
+    };
+
+    const mappedType = typeMapping[documentType] || 'REPORT_CARD';
+    
+    if (!DOCUMENT_TYPES[mappedType]) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid document type'
+      });
+    }
+
+    // Create PDF document
+    const doc = new PDFDocument({ autoFirstPage: false });
+    
+    // Set response headers
+    const filename = `${documentType}_${outputFormat || 'single'}_${Date.now()}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+    
+    // Pipe the PDF to the response
+    doc.pipe(res);
+
+    // Generate document for each student
+    for (const studentWrapper of students) {
+      try {
+        const student = studentWrapper.studentData || studentWrapper;
+        const customData = studentWrapper.customData || {};
+        
+        if (DOCUMENT_TYPES[mappedType].handler) {
+          await DOCUMENT_TYPES[mappedType].handler(doc, student, customData.schoolYear || new Date().getFullYear());
+        }
+      } catch (error) {
+        console.error(`Error processing student:`, error);
+        doc.addPage();
+        doc.fontSize(12).text(`Error processing student: ${error.message}`, {
+          color: 'red'
+        });
+      }
+    }
+
+    // End the document
+    doc.end();
+
+  } catch (error) {
+    console.error('Batch document generation error:', error);
+    
+    // If headers haven't been sent yet, send JSON error
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Error generating documents'
+      });
+    }
+  }
+});
 
 exports.generateDocument = catchAsync(async (req, res) => {
   try {
@@ -146,10 +225,13 @@ exports.generateDocument = catchAsync(async (req, res) => {
 
   } catch (error) {
     console.error('Document generation error:', error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || 'Error generating document'
-    });
+    
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Error generating document'
+      });
+    }
   }
 });
 
@@ -363,9 +445,13 @@ async function generateIDCard(doc, student) {
 
         // School Logo - with error handling
         try {
-            doc.image(path.join(__dirname, '../../../assets/logo.png'), 10, 10, { width: 30 });
+            const logoPath = path.join(__dirname, '../../../assets/logo.png');
+            // Check if logo exists before trying to use it
+            await fs.access(logoPath);
+            doc.image(logoPath, 10, 10, { width: 30 });
         } catch (error) {
             console.error('Error loading school logo:', error);
+            // Continue without logo
         }
         
         // Student Details with null checks
@@ -386,6 +472,7 @@ async function generateIDCard(doc, student) {
 
     } catch (error) {
         console.error('Error generating ID card:', error);
+        doc.addPage();
         doc.text('Error generating ID card: ' + error.message);
     }
 }
@@ -426,6 +513,7 @@ async function generateCharacterCertificate(doc, student) {
 
     } catch (error) {
         console.error('Error generating character certificate:', error);
+        doc.addPage();
         doc.text('Error generating character certificate: ' + error.message);
     }
 }
