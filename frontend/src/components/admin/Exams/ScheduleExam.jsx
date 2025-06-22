@@ -41,7 +41,7 @@ const ScheduleExam = () => {
 
   const fetchExamTypes = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/v1/exams'));
+      const response = await axios.get(getApiUrl('/api/exams'));
       console.log('Exam types response:', response.data);
 
       if (response.data.success) {
