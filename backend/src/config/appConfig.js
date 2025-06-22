@@ -1,11 +1,13 @@
 require('dotenv').config();
+console.log('[ENV] CORS_ORIGINS =', process.env.CORS_ORIGINS);
 
 const config = {
     app: {
         port: parseInt(process.env.PORT || '8080', 10),
         env: process.env.NODE_ENV || 'development',
-        corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000']
+        corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['https://unbick-erp.up.railway.app']
     },
+
     db: {
         uri: process.env.MONGODB_URI,
         options: {
