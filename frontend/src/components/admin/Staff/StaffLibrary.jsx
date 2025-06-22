@@ -66,11 +66,9 @@ const StaffLibrary = () => {
       });
 
       const token = localStorage.getItem('token');
-<<<<<<< HEAD
       const response = await fetch(getApiUrl(`/api/v1/admin/library/books?${queryParams}`), {
-=======
+
       const response = await fetch(`${API_BASE_URL}/books?${queryParams}`, {
->>>>>>> d9fcda63fb6e63fb1102e4fd66513292be4372f9
         headers: {
           'Authorization': `Bearer ${token}`
         }
