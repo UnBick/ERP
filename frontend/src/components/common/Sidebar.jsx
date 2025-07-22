@@ -197,7 +197,6 @@ const Sidebar = () => {
                     { path: '/admin/students/AdmisssionManagement', label: 'Manager' },
                     { path: '/admin/students/student-list', label: 'Student List' },
                     { path: '/admin/students/student-attendance', label: 'Attendance' },
-                    { path: '/admin/students/examinations', label: 'Examinations' },
                     { path: '/admin/students/student-library', label: 'Library' },
                     { path: '/admin/students/student-services', label: 'Services' },
                     { path: '/admin/students/student-transport', label: 'Transport' }
@@ -210,7 +209,6 @@ const Sidebar = () => {
                     { path: '/admin/staff/staff-list', label: 'Staff List' },
                     { path: '/admin/staff/staff-attendance', label: 'Attendance' },
                     { path: '/admin/staff/staff-leave', label: 'Leave Management' },
-                    { path: '/admin/staff/staff-library', label: 'Library Access' },
                     { path: '/admin/staff/staff-reports', label: 'Reports' },
                     { path: '/admin/staff/staff-services', label: 'Services' },
                     { path: '/admin/staff/staff-transport', label: 'Transport' }
@@ -257,15 +255,8 @@ const Sidebar = () => {
                     { path: '/admin/finance/reports/finance-reports', label: 'Finance Reports' },
                     { path: '/admin/finance/reports/payroll-report', label: 'Payroll Reports' }
                 ]
-            },
-            {
-                group: 'UnbickSchooling',
-                icon: 'unbick',
-                items: [
-                    { path: '/admin/unbick-schooling/books', label: 'Books' },
-                    { path: '/admin/unbick-schooling/predefined-syllabus', label: 'Predefined Syllabus' }
-                ]
-            },
+          },
+          
             {
                 group: 'Communication',
                 icon: 'communication',
@@ -285,20 +276,7 @@ const Sidebar = () => {
                     { path: '/admin/settings/signature', label: 'Signature' }
                 ]
             },
-            {
-                group: 'Website',
-                icon: 'website',
-                items: [
-                    { path: '/admin/website/about', label: 'About Section' },
-                    { path: '/admin/website/academics', label: 'Academics' },
-                    { path: '/admin/website/activities', label: 'Activities' },
-                    { path: '/admin/website/admissions', label: 'Admissions' },
-                    { path: '/admin/website/Gallery', label: 'Gallery' },
-                    { path: '/admin/website/Contact', label: 'Contact' },
-                    { path: '/admin/website/homepage', label: 'Homepage' },
-                    { path: '/admin/website/Settings', label: 'Settings' },
-                ]
-            }
+
         ],
         student: [
             {

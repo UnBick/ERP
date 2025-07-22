@@ -60,13 +60,11 @@ import Templates from './components/admin/Settings/TemplateList';
 import UserManagement from './components/admin/Settings/UserManagement';
 import StaffAttendance from './components/admin/Staff/StaffAttendance';
 import StaffLeave from './components/admin/Staff/StaffLeave';
-import StaffLibrary from './components/admin/Staff/StaffLibrary';
 import StaffList from './components/admin/Staff/StaffList';
 import StaffReports from './components/admin/Staff/StaffReports';
 import StaffServices from './components/admin/Staff/StaffServices';
 import StaffTransport from './components/admin/Staff/StaffTransport';
 import Manager from './components/admin/Students/AdmissionManagement';
-import Examinations from './components/admin/Students/Examinations';
 import AdminStudentAttendance from './components/admin/Students/StudentAttendance';
 import StudentLibrary from './components/admin/Students/StudentLibrary';
 import StudentList from './components/admin/Students/StudentList';
@@ -292,13 +290,11 @@ const App = () => {
                               <Route path="/admin/settings/signature" element={<Signature />} />
                               <Route path="/admin/staff/staff-attendance" element={<StaffAttendance />} />
                               <Route path="/admin/staff/staff-leave" element={<StaffLeave />} />
-                              <Route path="/admin/staff/staff-library" element={<StaffLibrary />} />
                               <Route path="/admin/staff/staff-list" element={<StaffList />} />
                               <Route path="/admin/staff/staff-reports" element={<StaffReports />} />
                               <Route path="/admin/staff/staff-services" element={<StaffServices />} />
                               <Route path="/admin/staff/staff-transport" element={<StaffTransport />} />
                               <Route path="/admin/students/AdmisssionManagement" element={<Manager />} />
-                              <Route path="/admin/students/examinations" element={<Examinations />} />
                               <Route path="/admin/students/student-attendance" element={<AdminStudentAttendance />} />
                               <Route path="/admin/students/student-library" element={<StudentLibrary />} />
                               <Route path="/admin/students/student-list" element={<StudentList />} />
