@@ -7,13 +7,43 @@ const classSchema = new mongoose.Schema({
         trim: true,
         unique: true
     },
+    level: {
+        type: String,
+        enum: ['Primary', 'Middle', 'Secondary', 'Higher Secondary'],
+        required: [true, 'Level is required']
+    },
     section: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Section'
     }],
+    // Change subjects to array of objects, not ObjectId
     subjects: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subject'
+        name: {
+            type: String,
+            required: true
+        },
+        periodsPerWeek: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 20
+        },
+        teacher: {
+            type: String,
+            required: true
+        },
+        continuousPeriods: {
+            type: Number,
+            default: 1,
+            min: 1,
+            max: 5
+        },
+        priority: {
+            type: Number,
+            default: 1,
+            min: 1,
+            max: 5
+        }
     }],
     classTeacher: {
         type: mongoose.Schema.Types.ObjectId,
@@ -42,9 +72,13 @@ const classSchema = new mongoose.Schema({
         index: true,
         trim: true,
         set: function(val) {
+            // Defensive: handle undefined/null
+            if (val === undefined || val === null) return '';
             return val.toString();
         },
         get: function(val) {
+            // Defensive: handle undefined/null
+            if (val === undefined || val === null) return '';
             return val.toString();
         }
     }

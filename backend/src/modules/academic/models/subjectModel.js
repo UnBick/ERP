@@ -31,7 +31,21 @@ const subjectSchema = new mongoose.Schema({
     department: {
         type: String,
         required: true,
-        enum: ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physical Education']
+        enum: [
+            'Mathematics',
+            'Science',
+            'English',
+            'History',
+            'Geography',
+            'Physical Education',
+            'Social Studies',
+            'Fine Arts',
+            'Computer Science',
+            'Languages',
+            'Commerce',
+            'Home Science',
+            'Arts' // <-- Add 'Arts' to support your seed data
+        ]
     },
     isActive: {
         type: Boolean,
@@ -41,4 +55,4 @@ const subjectSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Subject', subjectSchema);
+module.exports = mongoose.models.Subject || mongoose.model('Subject', subjectSchema);
