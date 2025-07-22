@@ -209,6 +209,9 @@ app.use('/api/v1/parent/fees', feesDetailsRoute);
 // Add parent communication routes
 app.use('/api/v1/parent/communication', require('./modules/parent/routes/communicationRoutes'));
 
+const publishSettingsRoute = require('./modules/exams/routes/publishSettingsRoute');
+app.use('/api/exam-publish-settings', publishSettingsRoute);
+
 // Error handling
 app.use(errorHandler);
 
