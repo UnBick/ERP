@@ -5,4 +5,4 @@
    ```
    REACT_APP_OPENAI_API_KEY=your_openai_api_key_here
    ```
-3. Restart your development server
+3. Restart your development server.
