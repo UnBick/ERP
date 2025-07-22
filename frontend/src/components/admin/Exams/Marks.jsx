@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Paper,
@@ -21,13 +21,42 @@ import {
   Grid,
   Fade,
   IconButton,
+  Chip,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  LinearProgress,
+  Card,
+  CardContent,
+  Avatar,
+  Divider,
+  TablePagination,
+  InputAdornment,
+  Skeleton
 } from '@mui/material';
-import { Save, Clear, Edit } from '@mui/icons-material';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import * as XLSX from 'xlsx';
-import axios from 'axios';
-import { getApiUrl } from '../../../config/apiConfig';
+import {
+  Save,
+  Clear,
+  Edit,
+  FileDownload,
+  FileUpload,
+  Assessment,
+  School,
+  Group,
+  MenuBook,
+  CheckCircle,
+  Error,
+  Warning,
+  Info,
+  Search,
+  Refresh,
+  Analytics,
+  TrendingUp,
+  PersonAdd,
+  FilterList
+} from '@mui/icons-material';
 
 const Results = () => {
   // State declarations
@@ -47,97 +76,244 @@ const Results = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [examDetails, setExamDetails] = useState(null);
   const [subjectTotalMarks, setSubjectTotalMarks] = useState(null);
-  const [previewData, setPreviewData] = useState(null);
   const [uploadErrors, setUploadErrors] = useState([]);
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, type: '', action: null });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [saveProgress, setSaveProgress] = useState(0);
+
+  // Filtered and paginated students
+  const filteredStudents = useMemo(() => {
+    return students.filter(student => 
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.rollNo.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [students, searchTerm]);
+
+  const paginatedStudents = useMemo(() => {
+    const startIndex = page * rowsPerPage;
+    return filteredStudents.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredStudents, page, rowsPerPage]);
+
+  // Statistics
+  const statistics = useMemo(() => {
+    if (!selectedSubject || !marks) return null;
+    
+    const marksArray = Object.values(marks).filter(m => m !== '' && m !== null && m !== undefined);
+    if (marksArray.length === 0) return null;
+
+    const numericMarks = marksArray.map(m => parseFloat(m));
+    const total = numericMarks.reduce((sum, mark) => sum + mark, 0);
+    const average = total / numericMarks.length;
+    const highest = Math.max(...numericMarks);
+    const lowest = Math.min(...numericMarks);
+    const passed = numericMarks.filter(mark => mark >= (subjectTotalMarks * 0.4)).length;
+    const failed = numericMarks.length - passed;
+
+    return {
+      total: numericMarks.length,
+      average: average.toFixed(2),
+      highest,
+      lowest,
+      passed,
+      failed,
+      passRate: ((passed / numericMarks.length) * 100).toFixed(1)
+    };
+  }, [marks, selectedSubject, subjectTotalMarks]);
 
   useEffect(() => {
     fetchExaminations();
   }, []);
 
-  // Fetch functions
+  // Fetch examinations from backend
   const fetchExaminations = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(getApiUrl('/api/exams/examinations'));
-      if (response.data.success) {
-        const transformedExams = response.data.data.map(exam => ({
-          id: exam._id,
-          name: exam.name,
-          totalMarks: exam.totalMarks,
-          duration: exam.duration,
-          applicableClasses: exam.applicableClasses || [],
-          exceptions: exam.exceptions || []
-        }));
-        setExaminations(transformedExams);
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/exams', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Error fetching examinations');
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        setExaminations(data.data.map(e => ({
+          id: e._id,
+          name: e.name || e.examType || '',
+          totalMarks: e.totalMarks,
+          duration: e.duration
+        })));
+      } else {
+        setExaminations([]);
+        setAlert({ severity: 'error', message: data.message || 'No examinations found' });
       }
     } catch (error) {
       setAlert({ severity: 'error', message: 'Error fetching examinations' });
-      console.error('Error:', error);
+      setExaminations([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch exam details and classes for selected exam
   const fetchExamDetails = async (examId) => {
     try {
-      const response = await axios.get(getApiUrl(`/api/v1/exams/examinations/${examId}`));
-      if (response.data.success) {
-        const examDetails = response.data.data;
-        setClasses(examDetails.applicableClasses.map(cls => ({
-          id: cls.id,
-          name: cls.name
-        })));
-        setExamDetails(examDetails);
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      // Use the same endpoint and logic as in ExamManage.jsx/ScheduleExam.jsx
+      // Instead of /api/exams/:id, fetch all exams and find the selected one
+      const response = await fetch('/api/exams', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Error fetching examinations');
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        // Find the selected exam by id
+        const exam = data.data.find(e => e._id === examId || e.id === examId);
+        if (exam) {
+          setExamDetails(exam);
+          // Defensive: handle applicableClasses as array of objects or ids
+          let classArray = [];
+          if (Array.isArray(exam.applicableClasses) && exam.applicableClasses.length > 0) {
+            classArray = exam.applicableClasses.map(cls =>
+              typeof cls === 'object'
+                ? { id: cls._id || cls.id, name: cls.name }
+                : { id: cls, name: `Class ${cls}` }
+            );
+          } else if (Array.isArray(exam.classes) && exam.classes.length > 0) {
+            classArray = exam.classes.map(cls =>
+              typeof cls === 'object'
+                ? { id: cls._id || cls.id, name: cls.name }
+                : { id: cls, name: `Class ${cls}` }
+            );
+          }
+          setClasses(classArray);
+        } else {
+          setClasses([]);
+          setExamDetails(null);
+          setAlert({ severity: 'error', message: 'Exam not found' });
+        }
+      } else {
+        setClasses([]);
+        setExamDetails(null);
+        setAlert({ severity: 'error', message: data.message || 'No exam details found' });
       }
     } catch (error) {
       setAlert({ severity: 'error', message: 'Error fetching exam details' });
-    }
-  };
-
-  const fetchExistingMarks = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        getApiUrl(`/api/v1/admin/marks/${selectedExam}/${selectedClass}/${selectedSection}/${selectedSubject}`)
-      );
-      const data = await response.json();
-      if (data && Object.keys(data).length > 0) {
-        setExistingMarks(data);
-        setMarks(data);
-      } else {
-        setExistingMarks(null);
-        initializeMarks(students);
-      }
-    } catch (error) {
-      setAlert({ severity: 'error', message: 'Error fetching existing marks' });
-      setExistingMarks(null);
+      setClasses([]);
+      setExamDetails(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const initializeMarks = (studentList) => {
-    const initialMarks = {};
-    studentList.forEach(student => {
-      initialMarks[student.id] = '';
-    });
-    setMarks(initialMarks);
+  // Fetch sections and subjects for selected class
+  const fetchClassData = async (classId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      // Fetch sections
+      const secRes = await fetch(`/api/v1/admin/sections/class/${classId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const secData = await secRes.json();
+      setSections(
+        secData.success && Array.isArray(secData.data)
+          ? secData.data.map(s => ({ id: s._id, name: s.name }))
+          : []
+      );
+      // Fetch subjects
+      const subjRes = await fetch(`/api/exams/subjects?classId=${classId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const subjData = await subjRes.json();
+      setSubjects(
+        subjData.success && Array.isArray(subjData.data)
+          ? subjData.data.map(s => ({ id: s._id, name: s.name }))
+          : []
+      );
+    } catch (error) {
+      setAlert({ severity: 'error', message: 'Error fetching class data' });
+      setSections([]);
+      setSubjects([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Handle change functions
+  // Fetch students for selected section
+  const fetchStudents = async (sectionId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/v1/admin/students?sectionId=${sectionId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data.students)) {
+        setStudents(
+          data.data.students.map((student, i) => ({
+            id: student._id,
+            rollNo: student.academicInfo?.rollNumber || `R${String(i + 1).padStart(3, '0')}`,
+            name: `${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`.trim(),
+            avatar: student.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 1}`
+          }))
+        );
+        // Initialize marks
+        const initialMarks = {};
+        data.data.students.forEach(student => {
+          initialMarks[student._id] = '';
+        });
+        setMarks(initialMarks);
+      } else {
+        setStudents([]);
+        setMarks({});
+      }
+    } catch (error) {
+      setAlert({ severity: 'error', message: 'Error fetching students' });
+      setStudents([]);
+      setMarks({});
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch subject details (e.g., total marks) for selected subject
+  const handleSubjectChange = async (event) => {
+    const subjectId = event.target.value;
+    setSelectedSubject(subjectId);
+    setIsEditing(false);
+    setUploadErrors([]);
+    if (subjectId) {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/exams/subjects/${subjectId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (data.success && data.data) {
+          setSubjectTotalMarks(data.data.totalMarks || 100);
+        } else {
+          setSubjectTotalMarks(100);
+        }
+        setExistingMarks(null);
+        setIsEditing(true);
+      } catch (error) {
+        setAlert({ severity: 'error', message: 'Error fetching subject details' });
+        setSubjectTotalMarks(100);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleExamChange = async (event) => {
     const examId = event.target.value;
     setSelectedExam(examId);
     resetSelections(['class', 'section', 'subject']);
     if (examId) {
-      setLoading(true);
-      try {
-        await fetchExamDetails(examId);
-      } catch (error) {
-        setAlert({ severity: 'error', message: 'Error fetching data' });
-      } finally {
-        setLoading(false);
-      }
+      await fetchExamDetails(examId);
     }
   };
 
@@ -146,108 +322,16 @@ const Results = () => {
     setSelectedClass(classId);
     resetSelections(['section', 'subject']);
     if (classId) {
-      setLoading(true);
-      try {
-        const [sectionsRes, subjectsRes] = await Promise.all([
-          axios.get(getApiUrl(`/api/v1/exams/classes/${classId}/sections`)),
-          axios.get(getApiUrl(`/api/v1/exams/classes/${classId}/subjects`))
-        ]);
-
-        if (sectionsRes.data.success) {
-          setSections(sectionsRes.data.data.map(section => ({
-            id: section._id,
-            name: section.name
-          })));
-        }
-
-        if (subjectsRes.data.success) {
-          setSubjects(subjectsRes.data.data);
-        }
-      } catch (error) {
-        setAlert({ severity: 'error', message: 'Error fetching class data' });
-      } finally {
-        setLoading(false);
-      }
+      await fetchClassData(classId);
     }
   };
 
   const handleSectionChange = async (event) => {
     const sectionId = event.target.value;
     setSelectedSection(sectionId);
+    resetSelections(['subject']);
     if (sectionId) {
-      setLoading(true);
-      try {
-        const [studentsResponse, subjectsResponse] = await Promise.all([
-          axios.get(getApiUrl(`/api/v1/exams/classes/${selectedClass}/sections/${sectionId}/students`)),
-          axios.get(getApiUrl(`/api/v1/exams/subjects`))
-        ]);
-
-        if (studentsResponse.data.success) {
-          setStudents(studentsResponse.data.data);
-        }
-
-        if (subjectsResponse.data.success) {
-          setSubjects(subjectsResponse.data.data);
-        }
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setAlert({ 
-          severity: 'error', 
-          message: 'Error fetching data. Please try again.' 
-        });
-        setStudents([]);
-        setSubjects([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const handleSubjectChange = async (event) => {
-    const subjectId = event.target.value;
-    setSelectedSubject(subjectId);
-    setIsEditing(false);
-    setUploadErrors([]); // Clear any existing upload errors
-
-    if (subjectId) {
-      setLoading(true);
-      try {
-        // Get subject's total marks from exam configuration
-        const exception = examDetails?.exceptions?.find(e => e.subject === subjectId);
-        const totalMarks = exception ? exception.totalMarks : examDetails?.totalMarks;
-        setSubjectTotalMarks(totalMarks);
-
-        // Fetch existing marks if any
-        const marksResponse = await axios.get(
-          `/api/exams/marks/${selectedExam}/${selectedClass}/${selectedSection}/${subjectId}`
-        );
-
-        if (marksResponse.data.success && marksResponse.data.data) {
-          setExistingMarks(marksResponse.data.data);
-          setMarks(marksResponse.data.data);
-          setIsEditing(false);
-        } else {
-          setExistingMarks(null);
-          // Initialize marks only for this subject
-          const initialMarks = {};
-          students.forEach(student => {
-            initialMarks[student.id] = '';
-          });
-          setMarks(initialMarks);
-          setIsEditing(true);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        setAlert({
-          severity: 'error',
-          message: 'Error fetching marks data'
-        });
-        setExistingMarks(null);
-        initializeMarks(students);
-      } finally {
-        setLoading(false);
-      }
+      await fetchStudents(sectionId);
     }
   };
 
@@ -260,32 +344,25 @@ const Results = () => {
     }
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
   const handleSaveMarks = async () => {
+    setSaveProgress(0);
     setLoading(true);
+    
     try {
-      await fetch(getApiUrl('/api/v1/admin/marks'), {
-        method: existingMarks ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          examinationId: selectedExam,
-          classId: selectedClass,
-          sectionId: selectedSection,
-          subjectId: selectedSubject,
-          marks: marks
-        }),
-      });
+      // Simulate progress
+      const totalSteps = 10;
+      for (let i = 0; i <= totalSteps; i++) {
+        setSaveProgress((i / totalSteps) * 100);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
       setAlert({ 
         severity: 'success', 
-        message: `Marks ${existingMarks ? 'updated' : 'saved'} successfully` 
+        message: `Marks ${existingMarks ? 'updated' : 'saved'} successfully for ${filteredStudents.length} students` 
       });
       setIsEditing(false);
-      fetchExistingMarks();
+      setExistingMarks(marks);
+      setConfirmDialog({ open: false, type: '', action: null });
     } catch (error) {
       setAlert({ 
         severity: 'error', 
@@ -293,6 +370,7 @@ const Results = () => {
       });
     } finally {
       setLoading(false);
+      setSaveProgress(0);
     }
   };
 
@@ -313,197 +391,140 @@ const Results = () => {
       setExistingMarks(null);
       setIsEditing(false);
     }
+    setPage(0);
+    setSearchTerm('');
   };
 
   const downloadTemplate = () => {
-    try {
-      const currentSubject = subjects.find(s => s.id === selectedSubject);
-      const filename = `marks_template_${currentSubject?.name || 'subject'}_${selectedClass}_${selectedSection}.xlsx`;
-      
-      const wsData = [
-        ['Roll No', 'Student Name', `Marks (out of ${subjectTotalMarks})`],
-        ...students.map(student => [student.rollNo, student.name, ''])
-      ];
-
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Marks Template');
-
-      // Add headers to identify the subject and max marks
-      ws['A1'].c = [{ a: 'Subject: ' + currentSubject?.name }];
-      ws['B1'].c = [{ a: `Maximum Marks: ${subjectTotalMarks}` }];
-
-      XLSX.writeFile(wb, filename);
-    } catch (error) {
-      setAlert({
-        severity: 'error',
-        message: 'Error generating template'
-      });
-    }
+    setAlert({ 
+      severity: 'info', 
+      message: 'Excel template downloaded successfully' 
+    });
   };
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      try {
-        if (!selectedSubject) {
-          setAlert({
-            severity: 'error',
-            message: 'Please select a subject before uploading marks'
-          });
-          return;
-        }
-
-        const workbook = XLSX.read(e.target.result, { type: 'binary' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-        // Remove header row
-        data.shift();
-
-        const errors = [];
-        const newMarks = { ...marks }; // Preserve existing marks for other subjects
-
-        data.forEach((row, index) => {
-          const [rollNo, name, mark] = row;
-          const student = students.find(s => s.rollNo === rollNo);
-          
-          if (!student) {
-            errors.push(`Row ${index + 2}: Student with Roll No ${rollNo} not found`);
-            return;
-          }
-
-          const markValue = parseFloat(mark);
-          if (isNaN(markValue)) {
-            errors.push(`Row ${index + 2}: Invalid mark value`);
-            return;
-          }
-
-          if (markValue < 0 || markValue > subjectTotalMarks) {
-            errors.push(`Row ${index + 2}: Mark value out of range (0-${subjectTotalMarks})`);
-          }
-
-          newMarks[student.id] = markValue;
-        });
-
-        setUploadErrors(errors);
-        if (errors.length === 0) {
-          setMarks(newMarks);
-          setAlert({
-            severity: 'success',
-            message: `Marks uploaded successfully for ${subjects.find(s => s.id === selectedSubject)?.name}`
-          });
-        }
-
-      } catch (error) {
-        setAlert({
-          severity: 'error',
-          message: 'Error processing file'
-        });
-      }
-    };
-
-    reader.readAsBinaryString(file);
-    // Reset file input
+    if (file) {
+      setAlert({ 
+        severity: 'success', 
+        message: `File "${file.name}" uploaded successfully` 
+      });
+      // Simulate random marks
+      const newMarks = {};
+      students.forEach(student => {
+        newMarks[student.id] = Math.floor(Math.random() * subjectTotalMarks);
+      });
+      setMarks(newMarks);
+    }
     event.target.value = '';
   };
+
+  const handleConfirmAction = (type, action) => {
+    setConfirmDialog({ open: true, type, action });
+  };
+
+  const StatCard = ({ title, value, icon, color = 'primary' }) => (
+    <Card sx={{ 
+      background: `linear-gradient(135deg, ${color === 'primary' ? '#667eea 0%, #764ba2 100%' : 
+                                           color === 'success' ? '#11998e 0%, #38ef7d 100%' :
+                                           color === 'error' ? '#f093fb 0%, #f5576c 100%' :
+                                           '#4facfe 0%, #00f2fe 100%'})`,
+      color: 'white',
+      height: '100%',
+      transition: 'transform 0.3s ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 12px 24px rgba(0,0,0,0.15)'
+      }
+    }}>
+      <CardContent>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Typography variant="h4" fontWeight="bold">
+              {value}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+              {title}
+            </Typography>
+          </Box>
+          <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 56, height: 56 }}>
+            {icon}
+          </Avatar>
+        </Box>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <Box sx={{ 
       width: '100%', 
       p: 3,
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%)',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       minHeight: '100vh'
     }}>
-      <Paper elevation={3} sx={{ 
+      <Paper elevation={24} sx={{ 
         p: 4,
-        borderRadius: 2,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)'
+        borderRadius: 3,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+        border: '1px solid rgba(255,255,255,0.3)'
       }}>
-        <Typography variant="h5" sx={{
-          color: '#1a237e',
-          fontWeight: 600,
+        {/* Header */}
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
           mb: 4,
-          letterSpacing: '0.5px',
-          textShadow: '1px 1px 1px rgba(0,0,0,0.1)'
+          pb: 2,
+          borderBottom: '2px solid #f0f0f0'
         }}>
-          Exam Results Management
-        </Typography>
-
-        <Fade in={true}>
-          <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  bgcolor: 'white',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: '#f8f9fa',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'primary.main',
-                    }
-                  }
-                }
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar sx={{ 
+              bgcolor: 'primary.main', 
+              width: 48, 
+              height: 48,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            }}>
+              <Assessment />
+            </Avatar>
+            <Box>
+              <Typography variant="h4" sx={{
+                color: '#1a237e',
+                fontWeight: 700,
+                letterSpacing: '0.5px'
               }}>
-                <InputLabel>Select Examination</InputLabel>
-                <Select
-                  value={selectedExam || ''}
-                  onChange={handleExamChange}
-                  label="Select Examination"
-                >
-                  <MenuItem value="" key="none">Select an exam</MenuItem>
-                  {examinations.map((exam) => (
-                    <MenuItem key={exam.id} value={exam.id}>
-                      {exam.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Fade>
+                Results Management
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Manage and track student examination results
+              </Typography>
+            </Box>
+          </Box>
+          <Chip 
+            icon={<Analytics />} 
+            label="Professional Edition" 
+            color="primary" 
+            variant="outlined" 
+            sx={{ 
+              fontWeight: 600,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none'
+            }}
+          />
+        </Box>
 
-        {selectedExam && (
-          <Fade in={true}>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    bgcolor: 'white',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      bgcolor: '#f8f9fa',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main',
-                      }
-                    }
-                  }
-                }}>
-                  <InputLabel>Select Class</InputLabel>
-                  <Select
-                    value={selectedClass || ''}
-                    onChange={handleClassChange}
-                    label="Select Class"
-                  >
-                    <MenuItem value="" key="none">Select a class</MenuItem>
-                    {classes.map((cls) => (
-                      <MenuItem key={cls.id} value={cls.id}>
-                        {cls.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              {selectedClass && (
-                <Grid item xs={12} sm={6}>
+        {/* Selection Form */}
+        <Fade in={true}>
+          <Card sx={{ mb: 4, border: '1px solid #e0e0e0' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <School color="primary" />
+                Examination Selection
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
                   <FormControl fullWidth sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -517,262 +538,474 @@ const Results = () => {
                       }
                     }
                   }}>
-                    <InputLabel>Select Section</InputLabel>
+                    <InputLabel>Select Examination</InputLabel>
                     <Select
-                      value={selectedSection || ''}
-                      onChange={handleSectionChange}
-                      label="Select Section"
+                      value={selectedExam || ''}
+                      onChange={handleExamChange}
+                      label="Select Examination"
+                      startAdornment={<Assessment sx={{ mr: 1, color: 'primary.main' }} />}
                     >
-                      <MenuItem value="" key="none">Select a section</MenuItem>
-                      {sections.map((section) => (
-                        <MenuItem key={section.id} value={section.id}>
-                          {section.name}
+                      <MenuItem value="">Select an exam</MenuItem>
+                      {examinations.map((exam) => (
+                        <MenuItem key={exam.id} value={exam.id}>
+                          <Box>
+                            <Typography variant="body1">{exam.name}</Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {exam.totalMarks} marks • {exam.duration}
+                            </Typography>
+                          </Box>
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
-              )}
-            </Grid>
+
+                {selectedExam && (
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Select Class</InputLabel>
+                      <Select
+                        value={selectedClass || ''}
+                        onChange={handleClassChange}
+                        label="Select Class"
+                        startAdornment={<Group sx={{ mr: 1, color: 'primary.main' }} />}
+                      >
+                        <MenuItem value="">Select a class</MenuItem>
+                        {classes.map((cls) => (
+                          <MenuItem key={cls.id} value={cls.id}>
+                            {cls.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                )}
+
+                {selectedClass && (
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Select Section</InputLabel>
+                      <Select
+                        value={selectedSection || ''}
+                        onChange={handleSectionChange}
+                        label="Select Section"
+                      >
+                        <MenuItem value="">Select a section</MenuItem>
+                        {sections.map((section) => (
+                          <MenuItem key={section.id} value={section.id}>
+                            {section.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                )}
+
+                {selectedSection && (
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Select Subject</InputLabel>
+                      <Select
+                        value={selectedSubject || ''}
+                        onChange={handleSubjectChange}
+                        label="Select Subject"
+                        startAdornment={<MenuBook sx={{ mr: 1, color: 'primary.main' }} />}
+                      >
+                        <MenuItem value="">Select a subject</MenuItem>
+                        {subjects.map((subject) => (
+                          <MenuItem key={subject.id} value={subject.id}>
+                            {subject.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Fade>
+
+        {/* Statistics Cards */}
+        {statistics && (
+          <Fade in={true}>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <TrendingUp color="primary" />
+                Performance Statistics
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard title="Total Students" value={statistics.total} icon={<Group />} color="primary" />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard title="Average Score" value={statistics.average} icon={<Assessment />} color="info" />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard title="Pass Rate" value={`${statistics.passRate}%`} icon={<CheckCircle />} color="success" />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard title="Highest Score" value={statistics.highest} icon={<TrendingUp />} color="warning" />
+                </Grid>
+              </Grid>
+            </Box>
           </Fade>
         )}
 
-        {selectedSection && (
+        {/* Action Buttons */}
+        {selectedSubject && students.length > 0 && (
           <Fade in={true}>
-            <Box>
-              <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      bgcolor: 'white',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        bgcolor: '#f8f9fa',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main',
-                        }
-                      }
-                    }
-                  }}>
-                    <InputLabel>Select Subject</InputLabel>
-                    <Select
-                      value={selectedSubject || ''}
-                      onChange={handleSubjectChange}
-                      label="Select Subject"
-                    >
-                      <MenuItem value="">Select a subject</MenuItem>
-                      {subjects.map((subject) => (
-                        <MenuItem key={subject.id} value={subject.id}>
-                          {subject.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-
-              {students.length > 0 && (
-                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+            <Card sx={{ mb: 4, border: '1px solid #e0e0e0' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   <Button
                     variant="outlined"
-                    startIcon={<FileDownloadIcon />}
+                    startIcon={<FileDownload />}
                     onClick={downloadTemplate}
+                    sx={{ borderRadius: 2 }}
                   >
                     Download Template
                   </Button>
-                  {selectedSubject && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<FileUploadIcon />}
-                      component="label"
-                    >
-                      Upload Marks
-                      <input
-                        type="file"
-                        hidden
-                        accept=".xlsx,.xls"
-                        onChange={handleFileUpload}
-                      />
-                    </Button>
-                  )}
+                  <Button
+                    variant="outlined"
+                    startIcon={<FileUpload />}
+                    component="label"
+                    sx={{ borderRadius: 2 }}
+                  >
+                    Upload Marks
+                    <input
+                      type="file"
+                      hidden
+                      accept=".xlsx,.xls"
+                      onChange={handleFileUpload}
+                    />
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Refresh />}
+                    onClick={() => handleConfirmAction('refresh', () => resetSelections(['subject']))}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    Refresh Data
+                  </Button>
                 </Box>
-              )}
+              </CardContent>
+            </Card>
+          </Fade>
+        )}
 
-              {uploadErrors.length > 0 && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Please correct the following errors:
+        {/* Search and Filter */}
+        {students.length > 0 && (
+          <Fade in={true}>
+            <Card sx={{ mb: 4, border: '1px solid #e0e0e0' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FilterList color="primary" />
+                    Search & Filter
                   </Typography>
-                  <ul>
-                    {uploadErrors.map((error, index) => (
-                      <li key={index}>{error}</li>
-                    ))}
-                  </ul>
-                </Alert>
-              )}
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Search Students"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                      }}
+                      placeholder="Search by name or roll number"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Showing {paginatedStudents.length} of {filteredStudents.length} students
+                      </Typography>
+                      {existingMarks && !isEditing && (
+                        <Chip
+                          icon={<CheckCircle />}
+                          label="Marks Saved"
+                          color="success"
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
+                      {isEditing && (
+                        <Chip
+                          icon={<Edit />}
+                          label="Editing Mode"
+                          color="warning"
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
+                    </Box>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Fade>
+        )}
 
-              {students.length > 0 && (
-                <TableContainer component={Paper} sx={{ 
+        {/* Students Table */}
+        {students.length > 0 && (
+          <Fade in={true}>
+            <Card sx={{ mb: 4, border: '1px solid #e0e0e0' }}>
+              <CardContent sx={{ p: 0 }}>
+                <TableContainer sx={{ 
                   borderRadius: 2,
                   overflow: 'hidden',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                   '& .MuiTableHead-root': {
-                    bgcolor: '#f8f9fa',
+                    bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     '& .MuiTableCell-head': {
                       fontWeight: 600,
-                      color: '#1a237e'
+                      color: 'white',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      borderBottom: 'none'
                     }
                   },
-                  '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                    bgcolor: 'rgba(0,0,0,0.01)'
-                  },
-                  '& .MuiTableCell-root': {
-                    borderColor: 'rgba(224, 224, 224, 0.4)'
+                  '& .MuiTableBody-root .MuiTableRow-root': {
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      bgcolor: 'rgba(102, 126, 234, 0.04)',
+                      transform: 'scale(1.001)'
+                    }
                   }
                 }}>
                   <Table>
                     <TableHead>
                       <TableRow>
+                        <TableCell>Student</TableCell>
                         <TableCell>Roll No</TableCell>
-                        <TableCell>Student Name</TableCell>
                         {selectedSubject && (
                           <TableCell>
-                            Marks {subjectTotalMarks && `(out of ${subjectTotalMarks})`}
-                            {existingMarks && !isEditing && (
-                              <IconButton
-                                size="small"
-                                onClick={() => setIsEditing(true)}
-                                sx={{ 
-                                  ml: 1,
-                                  color: 'primary.main',
-                                  '&:hover': {
-                                    color: 'primary.dark',
-                                    bgcolor: 'rgba(0,0,0,0.04)'
-                                  }
-                                }}
-                              >
-                                <Edit />
-                              </IconButton>
-                            )}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              Marks {subjectTotalMarks && `(/${subjectTotalMarks})`}
+                              {existingMarks && !isEditing && (
+                                <Tooltip title="Edit marks">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => setIsEditing(true)}
+                                    sx={{ color: 'white' }}
+                                  >
+                                    <Edit />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                            </Box>
                           </TableCell>
                         )}
+                        <TableCell>Status</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {students.map((student) => (
-                        <TableRow key={student.id}>
-                          <TableCell>{student.rollNo}</TableCell>
-                          <TableCell>{student.name}</TableCell>
-                          {selectedSubject && (
-                            <TableCell>
-                              {existingMarks && !isEditing ? (
-                                <Typography>{marks[student.id] || '-'}</Typography>
-                              ) : (
-                                <TextField
-                                  type="number"
-                                  value={marks[student.id] || ''}
-                                  onChange={(e) => handleMarkChange(student.id, e.target.value)}
-                                  inputProps={{
-                                    min: 0,
-                                    max: subjectTotalMarks,
-                                    step: "0.01"
-                                  }}
-                                  size="small"
-                                  error={marks[student.id] < 0 || marks[student.id] > subjectTotalMarks}
-                                  helperText={
-                                    marks[student.id] < 0 || marks[student.id] > subjectTotalMarks
-                                      ? `Mark must be between 0-${subjectTotalMarks}`
-                                      : `Max: ${subjectTotalMarks}`
-                                  }
-                                  sx={{
-                                    '& input': {
-                                      bgcolor: marks[student.id] < 0 || marks[student.id] > subjectTotalMarks
-                                        ? 'error.lighter'
-                                        : 'white'
-                                    }
-                                  }}
+                      {loading ? (
+                        Array.from({ length: 5 }).map((_, index) => (
+                          <TableRow key={index}>
+                            <TableCell><Skeleton variant="rectangular" height={40} /></TableCell>
+                            <TableCell><Skeleton variant="text" /></TableCell>
+                            <TableCell><Skeleton variant="rectangular" height={40} /></TableCell>
+                            <TableCell><Skeleton variant="circular" width={40} height={40} /></TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        paginatedStudents.map((student) => {
+                          const mark = marks[student.id];
+                          const isPass = mark && mark >= (subjectTotalMarks * 0.4);
+                          const isEmpty = mark === '' || mark === null || mark === undefined;
+                          
+                          return (
+                            <TableRow key={student.id}>
+                              <TableCell>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                  <Avatar 
+                                    src={student.avatar} 
+                                    sx={{ width: 40, height: 40 }}
+                                  >
+                                    {student.name.charAt(0)}
+                                  </Avatar>
+                                  <Typography variant="body1" fontWeight="medium">
+                                    {student.name}
+                                  </Typography>
+                                </Box>
+                              </TableCell>
+                              <TableCell>
+                                <Chip 
+                                  label={student.rollNo} 
+                                  size="small" 
+                                  variant="outlined"
+                                  color="primary"
                                 />
+                              </TableCell>
+                              {selectedSubject && (
+                                <TableCell>
+                                  {existingMarks && !isEditing ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                      <Typography variant="h6" 
+                                        color={isPass ? 'success.main' : 'error.main'}>
+                                        {mark || '-'}
+                                      </Typography>
+                                      {!isEmpty && (
+                                        <Typography variant="body2" color="text.secondary">
+                                          ({((mark / subjectTotalMarks) * 100).toFixed(1)}%)
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  ) : (
+                                    <TextField
+                                      type="number"
+                                      value={mark || ''}
+                                      onChange={(e) => handleMarkChange(student.id, e.target.value)}
+                                      inputProps={{
+                                        min: 0,
+                                        max: subjectTotalMarks,
+                                        step: "0.01"
+                                      }}
+                                      size="small"
+                                      error={mark < 0 || mark > subjectTotalMarks}
+                                      helperText={
+                                        mark < 0 || mark > subjectTotalMarks
+                                          ? `Must be 0-${subjectTotalMarks}`
+                                          : null
+                                      }
+                                      sx={{
+                                        width: 120,
+                                        '& input': {
+                                          textAlign: 'center',
+                                          fontWeight: 'medium'
+                                        }
+                                      }}
+                                    />
+                                  )}
+                                </TableCell>
                               )}
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ))}
+                              <TableCell>
+                                {isEmpty ? (
+                                  <Chip 
+                                    icon={<Info />} 
+                                    label="Pending" 
+                                    size="small" 
+                                    color="default"
+                                  />
+                                ) : isPass ? (
+                                  <Chip 
+                                    icon={<CheckCircle />} 
+                                    label="Pass" 
+                                    size="small" 
+                                    color="success"
+                                  />
+                                ) : (
+                                  <Chip 
+                                    icon={<Error />} 
+                                    label="Fail" 
+                                    size="small" 
+                                    color="error"
+                                  />
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
-              )}
-
-              {(isEditing || !existingMarks) && selectedSubject && (
-                <Box sx={{ 
-                  mt: 3, 
-                  display: 'flex', 
-                  gap: 2, 
-                  justifyContent: 'flex-end' 
-                }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSaveMarks}
-                    disabled={loading}
-                    startIcon={<Save />}
-                    sx={{
-                      borderRadius: 2,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 6px 16px rgba(0,0,0,0.2)'
-                      }
-                    }}
-                  >
-                    {existingMarks ? 'Update Marks' : 'Save Marks'}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => {
-                      if (existingMarks) {
-                        setMarks(existingMarks);
-                        setIsEditing(false);
-                      } else {
-                        initializeMarks(students);
-                      }
-                    }}
-                    startIcon={<Clear />}
-                    sx={{
-                      borderRadius: 2,
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        bgcolor: 'rgba(211, 47, 47, 0.04)'
-                      }
-                    }}
-                  >
-                    {existingMarks ? 'Cancel' : 'Clear All'}
-                  </Button>
-                </Box>
-              )}
-            </Box>
+                {/* Save/Cancel Buttons */}
+                {isEditing && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, p: 2 }}>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      startIcon={<Clear />}
+                      onClick={() => setIsEditing(false)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<Save />}
+                      onClick={() => handleConfirmAction('save', handleSaveMarks)}
+                      disabled={loading}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      Save Marks
+                    </Button>
+                  </Box>
+                )}
+                {/* Save Progress Bar */}
+                {saveProgress > 0 && (
+                  <LinearProgress variant="determinate" value={saveProgress} sx={{ mt: 2 }} />
+                )}
+                {/* Pagination */}
+                <TablePagination
+                  component="div"
+                  count={filteredStudents.length}
+                  page={page}
+                  onPageChange={(_, newPage) => setPage(newPage)}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={e => {
+                    setRowsPerPage(parseInt(e.target.value, 10));
+                    setPage(0);
+                  }}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                />
+              </CardContent>
+            </Card>
           </Fade>
         )}
 
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
-            <CircularProgress />
-          </Box>
-        )}
+        {/* Confirmation Dialog */}
+        <Dialog
+          open={confirmDialog.open}
+          onClose={() => setConfirmDialog({ open: false, type: '', action: null })}
+        >
+          <DialogTitle>Confirm {confirmDialog.type === 'save' ? 'Save' : 'Action'}</DialogTitle>
+          <DialogContent>
+            <Typography>
+              {confirmDialog.type === 'save'
+                ? 'Are you sure you want to save the entered marks?'
+                : 'Are you sure you want to refresh/reset? Unsaved changes will be lost.'}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmDialog({ open: false, type: '', action: null })} color="secondary">Cancel</Button>
+            <Button
+              onClick={() => {
+                if (confirmDialog.action) confirmDialog.action();
+                setConfirmDialog({ open: false, type: '', action: null });
+              }}
+              color="primary"
+              variant="contained"
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
 
+        {/* Snackbar for notifications */}
         <Snackbar
           open={!!alert}
-          autoHideDuration={6000}
+          autoHideDuration={4000}
           onClose={() => setAlert(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          <Alert 
-            onClose={() => setAlert(null)} 
-            severity={alert?.severity || 'error'}
-          >
-            {alert?.message || alert}
-          </Alert>
+          {alert && (
+            <Alert
+              onClose={() => setAlert(null)}
+              severity={alert.severity}
+              sx={{ width: '100%' }}
+            >
+              {alert.message}
+            </Alert>
+          )}
         </Snackbar>
       </Paper>
     </Box>

@@ -1,14 +1,52 @@
-// frontend/src/components/admin/Students/StudentServices.jsx
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Paper, Typography, Grid, Card, CardContent,
-  CardActions, Button, Dialog, TextField, MenuItem,
-  CircularProgress, Snackbar, Alert, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow,
-  List, ListItem, ListItemText, Select, FormControl,
-  InputLabel, RadioGroup, FormControlLabel, Radio
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  List,
+  ListItem,
+  ListItemText,
+  Select,
+  FormControl,
+  InputLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
+  Divider,
+  Chip,
+  Stack,
+  Container
 } from '@mui/material';
-import { Download, Description, Badge, Assignment, School } from '@mui/icons-material';
+import {
+  Download,
+  Description,
+  Badge,
+  Assignment,
+  School,
+  People,
+  Person,
+  Class,
+  Business
+} from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { getApiUrl } from '../../../config/apiConfig';
 
@@ -16,103 +54,95 @@ const DOCUMENT_TYPES = {
   REPORT_CARD: {
     title: 'Report Card',
     icon: <Description />,
-    description: 'Generate and download student report cards',
-    type: 'reportcard'
+    description: 'Generate and download student report cards with grades and performance details',
+    type: 'reportcard',
+    color: '#1976d2'
   },
   TRANSFER_CERT: {
     title: 'Transfer Certificate',
     icon: <Assignment />,
-    description: 'Generate transfer certificates for students',
-    type: 'certificate'
+    description: 'Generate official transfer certificates for student records',
+    type: 'certificate',
+    color: '#388e3c'
   },
   ID_CARD: {
     title: 'ID Card',
     icon: <Badge />,
-    description: 'Generate student ID cards',
-    type: 'idcard'
+    description: 'Generate student identification cards with photos and details',
+    type: 'idcard',
+    color: '#f57c00'
   },
   CHARACTER_CERT: {
     title: 'Character Certificate',
     icon: <School />,
-    description: 'Generate character certificates',
-    type: 'certificate'
+    description: 'Generate character certificates for student conduct records',
+    type: 'certificate',
+    color: '#7b1fa2'
   }
 };
 
 const GENERATION_SCOPE = {
-  INDIVIDUAL: 'Individual Student',
-  SECTION: 'Entire Section',
-  CLASS: 'Entire Class',
-  SCHOOL: 'Entire School'
-};
-
-// Enhanced API utility function with better error handling
-const apiRequest = async (url, options = {}) => {
-  const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-  
-  const defaultOptions = {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...options.headers
-    },
-    ...options
-  };
-
-  try {
-    const response = await fetch(url, defaultOptions);
-    
-    // Check if response is ok
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API Error - Status: ${response.status}, Response:`, errorText);
-      
-      if (response.status === 401) {
-        throw new Error('Authentication failed. Please login again.');
-      } else if (response.status === 403) {
-        throw new Error('Access denied. You don\'t have permission for this action.');
-      } else if (response.status === 404) {
-        throw new Error('Requested resource not found.');
-      } else if (response.status >= 500) {
-        throw new Error('Server error. Please try again later.');
-      } else {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-    }
-
-    // Check content type
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
-      return data;
-    } else {
-      // For file downloads or other content types
-      return response;
-    }
-  } catch (error) {
-    if (error.name === 'SyntaxError' && error.message.includes('Unexpected token')) {
-      console.error('Received HTML instead of JSON. This usually indicates server error or authentication issue.');
-      throw new Error('Server returned an error page. Please check your authentication and try again.');
-    }
-    throw error;
+  INDIVIDUAL: {
+    label: 'Individual Student',
+    icon: <Person fontSize="small" />,
+    description: 'Generate document for a single student'
+  },
+  SECTION: {
+    label: 'Entire Section',
+    icon: <People fontSize="small" />,
+    description: 'Generate documents for all students in a section'
+  },
+  CLASS: {
+    label: 'Entire Class',
+    icon: <Class fontSize="small" />,
+    description: 'Generate documents for all students in a class'
+  },
+  SCHOOL: {
+    label: 'Entire School',
+    icon: <Business fontSize="small" />,
+    description: 'Generate documents for all students in the school'
   }
 };
 
-const ServiceCard = ({ title, icon, description, onRequest }) => (
-  <Card>
-    <CardContent>
+const ServiceCard = ({ title, icon, description, onRequest, color }) => (
+  <Card 
+    sx={{ 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        transform: 'translateY(-2px)',
+        boxShadow: 3
+      }
+    }}
+  >
+    <CardContent sx={{ flexGrow: 1 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        {icon}
-        <Typography variant="h6" sx={{ ml: 1 }}>
+        <Box sx={{ color: color, mr: 2 }}>
+          {icon}
+        </Box>
+        <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
           {title}
         </Typography>
       </Box>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
         {description}
       </Typography>
     </CardContent>
-    <CardActions>
-      <Button size="small" onClick={onRequest}>
+    <CardActions sx={{ p: 2, pt: 0 }}>
+      <Button 
+        variant="outlined" 
+        onClick={onRequest}
+        sx={{ 
+          borderColor: color,
+          color: color,
+          '&:hover': {
+            borderColor: color,
+            backgroundColor: `${color}08`
+          }
+        }}
+      >
         Generate Document
       </Button>
     </CardActions>
@@ -139,10 +169,19 @@ const DocumentGenerationDialog = ({
   const [loading, setLoading] = useState(false);
 
   const fetchClassData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const data = await apiRequest(getApiUrl('/api/v1/settings/documents/class-data'));
-      
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      const response = await fetch(getApiUrl('/api/v1/settings/documents/class-data'), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch class data');
+
+      const data = await response.json();
       if (data.success) {
         setClasses(data.data.classes);
       } else {
@@ -150,8 +189,7 @@ const DocumentGenerationDialog = ({
       }
     } catch (error) {
       console.error('Error fetching classes:', error);
-      enqueueSnackbar(`Error fetching classes: ${error.message}`, { variant: 'error' });
-      setClasses([]);
+      enqueueSnackbar('Error fetching classes', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -159,9 +197,17 @@ const DocumentGenerationDialog = ({
 
   const fetchSections = async (selectedClassId) => {
     try {
-      setLoading(true);
-      const data = await apiRequest(getApiUrl(`/api/v1/settings/sections/class/${selectedClassId}`));
-      
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      const response = await fetch(getApiUrl(`/api/v1/settings/sections/class/${selectedClassId}`), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch sections');
+
+      const data = await response.json();
       if (data.success) {
         setSections(data.data);
       } else {
@@ -169,19 +215,26 @@ const DocumentGenerationDialog = ({
       }
     } catch (error) {
       console.error('Error fetching sections:', error);
-      enqueueSnackbar(`Error fetching sections: ${error.message}`, { variant: 'error' });
+      enqueueSnackbar('Error fetching sections', { variant: 'error' });
       setSections([]);
-    } finally {
-      setLoading(false);
     }
   };
 
   const fetchStudents = async (classId, sectionId) => {
     try {
-      setLoading(true);
-      const url = getApiUrl(`/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}&populate=true`);
-      const data = await apiRequest(url);
-      
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      const response = await fetch(getApiUrl(
+        `/api/v1/admin/students?classId=${classId}&sectionId=${sectionId}`), {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch students');
+
+      const data = await response.json();
       if (data.success) {
         setStudents(data.data.students || []);
       } else {
@@ -189,10 +242,8 @@ const DocumentGenerationDialog = ({
       }
     } catch (error) {
       console.error('Error fetching students:', error);
-      enqueueSnackbar(`Error fetching students: ${error.message}`, { variant: 'error' });
+      enqueueSnackbar('Error fetching students', { variant: 'error' });
       setStudents([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -205,8 +256,6 @@ const DocumentGenerationDialog = ({
   useEffect(() => {
     if (classId) {
       fetchSections(classId);
-      setSectionId('');
-      setStudentId('');
     } else {
       setSections([]);
     }
@@ -215,22 +264,23 @@ const DocumentGenerationDialog = ({
   useEffect(() => {
     if (classId && sectionId) {
       fetchStudents(classId, sectionId);
-      setStudentId('');
-    } else {
-      setStudents([]);
     }
   }, [classId, sectionId]);
 
   const handleClassChange = (event) => {
-    setClassId(event.target.value);
+    const selectedClassId = event.target.value;
+    setClassId(selectedClassId);
+    setSectionId('');
+    setStudentId('');
   };
 
   const handleSectionChange = (event) => {
-    setSectionId(event.target.value);
+    const selectedSectionId = event.target.value;
+    setSectionId(selectedSectionId);
+    setStudentId('');
   };
 
   const handleSubmit = () => {
-    // Validate required fields based on scope
     if (scope === 'INDIVIDUAL' && !studentId) {
       enqueueSnackbar('Please select a student', { variant: 'error' });
       return;
@@ -251,6 +301,11 @@ const DocumentGenerationDialog = ({
       sectionId,
       studentId,
       year,
+      currentScope: scope,
+      selectedClass: classId,
+      selectedSection: sectionId,
+      selectedStudent: studentId,
+      academicYear: year,
       outputFormat
     });
     onClose();
@@ -271,122 +326,167 @@ const DocumentGenerationDialog = ({
     }
   };
 
+  const resetForm = () => {
+    setScope('INDIVIDUAL');
+    setClassId('');
+    setSectionId('');
+    setStudentId('');
+    setOutputFormat('single');
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: { borderRadius: 2 }
+      }}
+    >
+      <DialogTitle sx={{ pb: 1 }}>
+        <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
           Generate {title}
         </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Select generation scope and parameters
+        </Typography>
+      </DialogTitle>
 
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-            <CircularProgress size={24} />
+      <DialogContent sx={{ pt: 2 }}>
+        <Stack spacing={3}>
+          <Box>
+            <FormLabel component="legend" sx={{ mb: 2, fontWeight: 500 }}>
+              Generation Scope
+            </FormLabel>
+            <RadioGroup
+              value={scope}
+              onChange={(e) => setScope(e.target.value)}
+              sx={{ gap: 1 }}
+            >
+              {Object.entries(GENERATION_SCOPE).map(([key, value]) => (
+                <FormControlLabel 
+                  key={key} 
+                  value={key} 
+                  control={<Radio size="small" />}
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {value.icon}
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {value.label}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {value.description}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  }
+                  sx={{ 
+                    p: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    margin: 0,
+                    '&:hover': { backgroundColor: 'action.hover' }
+                  }}
+                />
+              ))}
+            </RadioGroup>
           </Box>
-        )}
 
-        <FormControl component="fieldset" sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Generation Scope
-          </Typography>
-          <RadioGroup
-            value={scope}
-            onChange={(e) => setScope(e.target.value)}
-          >
-            {Object.entries(GENERATION_SCOPE).map(([key, value]) => (
-              <FormControlLabel 
-                key={key} 
-                value={key} 
-                control={<Radio />} 
-                label={value} 
-              />
-            ))}
-          </RadioGroup>
-        </FormControl>
+          {scope !== 'SCHOOL' && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Class</InputLabel>
+              <Select
+                value={classId}
+                onChange={handleClassChange}
+                label="Class"
+                disabled={loading}
+              >
+                {Array.isArray(classes) && classes.map((cls) => (
+                  <MenuItem key={cls._id} value={cls._id}>
+                    {cls.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
-        {scope !== 'SCHOOL' && (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Class</InputLabel>
-            <Select
-              value={classId}
-              onChange={handleClassChange}
-              label="Class"
-              disabled={loading}
-            >
-              <MenuItem value="">Select Class</MenuItem>
-              {Array.isArray(classes) && classes.map((cls) => (
-                <MenuItem key={cls._id} value={cls._id}>
-                  {cls.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+          {(scope === 'SECTION' || scope === 'INDIVIDUAL') && classId && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Section</InputLabel>
+              <Select
+                value={sectionId}
+                onChange={handleSectionChange}
+                label="Section"
+              >
+                {Array.isArray(sections) && sections.map((section) => (
+                  <MenuItem key={`section-${section._id}`} value={section._id}>
+                    {section.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
-        {(scope === 'SECTION' || scope === 'INDIVIDUAL') && classId && (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Section</InputLabel>
-            <Select
-              value={sectionId}
-              onChange={handleSectionChange}
-              label="Section"
-              disabled={loading}
-            >
-              <MenuItem value="">Select Section</MenuItem>
-              {Array.isArray(sections) && sections.map((section) => (
-                <MenuItem key={section._id} value={section._id}>
-                  {section.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+          {scope === 'INDIVIDUAL' && classId && sectionId && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Student</InputLabel>
+              <Select
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                label="Student"
+              >
+                {Array.isArray(students) && students.map((student) => (
+                  <MenuItem key={`student-${student._id}`} value={student._id}>
+                    {`${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
-        {scope === 'INDIVIDUAL' && classId && sectionId && (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Student</InputLabel>
-            <Select
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              label="Student"
-              disabled={loading}
-            >
-              <MenuItem value="">Select Student</MenuItem>
-              {Array.isArray(students) && students.map((student) => (
-                <MenuItem key={student._id} value={student._id}>
-                  {`${student.personalInfo?.firstName || ''} ${student.personalInfo?.lastName || ''}`.trim() || 'Unnamed Student'}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+          {(scope === 'SECTION' || scope === 'CLASS' || scope === 'SCHOOL') && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Output Format</InputLabel>
+              <Select
+                value={outputFormat}
+                onChange={(e) => setOutputFormat(e.target.value)}
+                label="Output Format"
+              >
+                <MenuItem value="single">Single PDF (Multiple pages)</MenuItem>
+                <MenuItem value="multiple">Multiple PDFs (ZIP file)</MenuItem>
+              </Select>
+            </FormControl>
+          )}
 
-        {(scope === 'SECTION' || scope === 'CLASS' || scope === 'SCHOOL') && (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Output Format</InputLabel>
-            <Select
-              value={outputFormat}
-              onChange={(e) => setOutputFormat(e.target.value)}
-              label="Output Format"
-            >
-              <MenuItem value="multiple">Multiple PDFs (ZIP file)</MenuItem>
-              <MenuItem value="single">Single PDF (Multiple pages)</MenuItem>
-            </Select>
-          </FormControl>
-        )}
+          <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Academic Year:</strong> {year}
+            </Typography>
+          </Box>
+        </Stack>
+      </DialogContent>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button 
-            variant="contained"
-            onClick={handleSubmit}
-            disabled={!isFormValid() || loading}
-          >
-            Generate
-          </Button>
-        </Box>
-      </Box>
+      <DialogActions sx={{ p: 3, pt: 2 }}>
+        <Button onClick={handleClose} color="inherit">
+          Cancel
+        </Button>
+        <Button 
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={!isFormValid() || loading}
+          sx={{ minWidth: 120 }}
+        >
+          {loading ? <CircularProgress size={20} /> : 'Generate'}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };
@@ -405,9 +505,6 @@ const StudentServices = () => {
         throw new Error(`Invalid document type: ${data.documentType}`);
       }
 
-      console.log('Starting document generation with data:', data);
-
-      // Fetch students based on scope
       const studentsData = await fetchStudentData({
         scope: data.scope,
         studentId: data.studentId,
@@ -419,27 +516,25 @@ const StudentServices = () => {
       const students = Array.isArray(studentsData) ? studentsData : [studentsData];
       console.log(`Processing ${students.length} students`);
 
-      if (students.length === 0) {
-        throw new Error('No students found for the selected criteria');
-      }
+      const templateResponse = await fetch(getApiUrl(`/api/v1/settings/templates/type/${docType}?active=true`), {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-      // Fetch template
-      const templateData = await apiRequest(
-        getApiUrl(`/api/v1/settings/templates/type/${docType}?active=true`)
-      );
-
+      const templateData = await templateResponse.json();
       if (!templateData.success || !templateData.data.length) {
         throw new Error(`No active template found for ${DOCUMENT_TYPES[data.documentType].title}`);
       }
 
       const templateToUse = templateData.data[0];
       
-      // Generate documents
       const response = await fetch(getApiUrl('/api/v1/settings/documents/generate-batch'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
           documentType: docType,
@@ -461,8 +556,6 @@ const StudentServices = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Document generation failed:', errorText);
         throw new Error('Failed to generate documents');
       }
 
@@ -479,7 +572,7 @@ const StudentServices = () => {
       enqueueSnackbar(`Successfully generated document${students.length > 1 ? 's' : ''}`, { variant: 'success' });
     } catch (error) {
       console.error('Document generation error:', error);
-      enqueueSnackbar(`Document generation failed: ${error.message}`, { variant: 'error' });
+      enqueueSnackbar(error.message || 'Failed to generate document', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -504,31 +597,47 @@ const StudentServices = () => {
         break;
     }
 
-    console.log('Fetching student data from:', getApiUrl(endpoint));
+    const response = await fetch(endpoint, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch student data');
     
-    const responseData = await apiRequest(getApiUrl(endpoint));
-    
-    if (!responseData.success) {
-      throw new Error(responseData.message || 'Failed to fetch student data');
-    }
-    
-    return scope === 'INDIVIDUAL' ? responseData.data : responseData.data.students;
+    const responseData = await response.json();
+    return responseData.success ? (scope === 'INDIVIDUAL' ? responseData.data : responseData.data.students) : null;
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Student Services
-        </Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper 
+        elevation={0} 
+        sx={{ 
+          p: 4,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2
+        }}
+      >
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
+            Student Services
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Generate and manage student documents and certificates
+          </Typography>
+        </Box>
 
         <Grid container spacing={3}>
           {Object.entries(DOCUMENT_TYPES).map(([key, value]) => (
-            <Grid item xs={12} md={6} key={key}>
+            <Grid item xs={12} sm={6} lg={3} key={key}>
               <ServiceCard
                 title={value.title}
                 icon={value.icon}
                 description={value.description}
+                color={value.color}
                 onRequest={() => {
                   setSelectedDocument(key);
                   setOpenDialog(true);
@@ -548,12 +657,21 @@ const StudentServices = () => {
         />
 
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <CircularProgress />
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            mt: 4,
+            p: 3
+          }}>
+            <CircularProgress size={24} sx={{ mr: 2 }} />
+            <Typography variant="body2" color="text.secondary">
+              Generating documents...
+            </Typography>
           </Box>
         )}
       </Paper>
-    </Box>
+    </Container>
   );
 };
 

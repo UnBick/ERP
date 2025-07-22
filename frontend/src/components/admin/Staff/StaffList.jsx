@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -6,22 +6,25 @@ import {
   Typography,
   Card,
   CardContent,
-  CardActions,
   Button,
-  CardActionArea,
-  Stack
+  Alert,
+  Skeleton,
+  Divider,
+  Chip,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import {
-  List as ListIcon,
+  ViewList as ViewListIcon,
   Edit as EditIcon,
   PersonAdd as PersonAddIcon,
   Description as DocumentIcon,
-  BusinessCenter,
-  People,
-  Assessment,
-  School
+  People as PeopleIcon,
+  School as SchoolIcon,
+  Business as BusinessIcon,
+  Assignment as AssignmentIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { getApiUrl } from '../../../config/apiConfig';
 
 // Import components
 import StaffTable from './StaffTable';
@@ -29,8 +32,21 @@ import StaffEdit from './StaffEdit';
 import StaffNew from './StaffNew';
 import StaffDocuments from './StaffDocuments';
 
+// Constants
+const STAFF_VIEWS = {
+  LIST: 'list',
+  EDIT: 'edit',
+  NEW: 'new',
+  DOCUMENTS: 'documents'
+};
 
-const StaffList = () => {
+const API_ENDPOINTS = {
+  DASHBOARD_STATS: '/api/v1/admin/staff/dashboard-stats',
+  STAFF_LIST: '/api/v1/admin/staff',
+  STAFF_DETAIL: (id) => `/api/v1/admin/staff/${id}`
+};
+
+const StaffManagement = () => {
   const [selectedView, setSelectedView] = useState(null);
   const [statsData, setStatsData] = useState({
     totalStaff: 0,
@@ -41,39 +57,68 @@ const StaffList = () => {
   });
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchDashboardStats();
+  // Utility function to get auth token
+  const getAuthToken = useCallback(() => {
+    return localStorage.getItem('token') || localStorage.getItem('authToken');
   }, []);
 
-  const fetchDashboardStats = async () => {
-    setLoading(true);
+  // Utility function to create API headers
+  const createHeaders = useCallback(() => {
+    const token = getAuthToken();
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }, [getAuthToken]);
+
+  // Error handler
+  const handleError = useCallback((error, defaultMessage) => {
+    console.error('Staff Management Error:', error);
+    setAlert({
+      type: 'error',
+      message: error.message || defaultMessage
+    });
+  }, []);
+
+  // Success handler
+  const handleSuccess = useCallback((message) => {
+    setAlert({
+      type: 'success',
+      message
+    });
+  }, []);
+
+  // Fetch dashboard statistics
+  const fetchDashboardStats = useCallback(async () => {
+    setStatsLoading(true);
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const response = await fetch(getApiUrl('/api/v1/admin/staff/dashboard-stats'), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const response = await fetch(API_ENDPOINTS.DASHBOARD_STATS, {
+        headers: createHeaders()
       });
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch dashboard stats: ${response.status}`);
       }
+
       const data = await response.json();
-      console.log('Dashboard stats received:', data);
+      
       if (data.success) {
-        setStatsData({
+        setStatsData(prevData => ({
+          ...prevData,
           totalStaff: data.data.totalStaff || 0,
           totalTeachers: data.data.totalTeachers || 0,
           activeDepartments: data.data.activeDepartments || 0,
           pendingRequests: data.data.pendingRequests || 0,
           recentActivity: data.data.recentActivity || []
-        });
+        }));
       } else {
-        throw new Error(data.message || 'Failed to fetch stats');
+        throw new Error(data.message || 'Failed to fetch dashboard statistics');
       }
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      handleError(error, 'Failed to load dashboard statistics');
+      // Reset to default values on error
       setStatsData({
         totalStaff: 0,
         totalTeachers: 0,
@@ -81,208 +126,295 @@ const StaffList = () => {
         pendingRequests: 0,
         recentActivity: []
       });
-      setAlert({
-        type: 'error',
-        message: error.message || 'Failed to load dashboard statistics'
-      });
     } finally {
+      setStatsLoading(false);
       setLoading(false);
     }
-  };
+  }, [createHeaders, handleError]);
 
-  const fetchStaffList = async (params = {}) => {
+  // Fetch staff list
+  const fetchStaffList = useCallback(async (params = {}) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(getApiUrl(`/api/v1/admin/staff?${queryString}`), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const url = queryString ? `${API_ENDPOINTS.STAFF_LIST}?${queryString}` : API_ENDPOINTS.STAFF_LIST;
+      
+      const response = await fetch(url, {
+        headers: createHeaders()
       });
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch staff list: ${response.status}`);
       }
+
       const data = await response.json();
+      
       if (data.success) {
         return data.data;
       } else {
         throw new Error(data.message || 'Failed to fetch staff list');
       }
     } catch (error) {
-      console.error('Error fetching staff list:', error);
-      setAlert({
-        type: 'error',
-        message: error.message || 'Failed to load staff list'
-      });
+      handleError(error, 'Failed to load staff list');
       return null;
     }
-  };
+  }, [createHeaders, handleError]);
 
-  const handleStaffAction = async (action, staffId, data = null) => {
+  // Handle staff actions (create, update, delete)
+  const handleStaffAction = useCallback(async (action, staffId, data = null) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: createHeaders()
       };
+
       let response;
+      let url;
+      let successMessage;
+
       switch (action) {
         case 'delete':
-          config.method = 'DELETE';
-          response = await fetch(getApiUrl(`/api/v1/admin/staff/${staffId}`), config);
+          url = API_ENDPOINTS.STAFF_DETAIL(staffId);
+          response = await fetch(url, { ...config, method: 'DELETE' });
+          successMessage = 'Staff member deleted successfully';
           break;
+
         case 'update':
-          config.method = 'PUT';
-          config.body = JSON.stringify(data);
-          response = await fetch(getApiUrl(`/api/v1/admin/staff/${staffId}`), config);
+          url = API_ENDPOINTS.STAFF_DETAIL(staffId);
+          response = await fetch(url, {
+            ...config,
+            method: 'PUT',
+            body: JSON.stringify(data)
+          });
+          successMessage = 'Staff member updated successfully';
           break;
+
         case 'create':
-          config.method = 'POST';
-          config.body = JSON.stringify(data);
-          response = await fetch(getApiUrl('/api/v1/admin/staff'), config);
+          url = API_ENDPOINTS.STAFF_LIST;
+          response = await fetch(url, {
+            ...config,
+            method: 'POST',
+            body: JSON.stringify(data)
+          });
+          successMessage = 'Staff member created successfully';
           break;
+
         default:
-          throw new Error('Invalid action');
+          throw new Error('Invalid action specified');
       }
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
+
       const result = await response.json();
+      
       if (result.success) {
-        setAlert({
-          type: 'success',
-          message: result.message || 'Operation successful'
-        });
+        handleSuccess(result.message || successMessage);
         await fetchDashboardStats(); // Refresh stats after successful action
+        return result;
       } else {
         throw new Error(result.message || 'Operation failed');
       }
     } catch (error) {
-      console.error('Error performing staff action:', error);
-      setAlert({
-        type: 'error',
-        message: error.message || 'Failed to perform action'
-      });
+      handleError(error, 'Failed to perform staff action');
+      throw error;
     }
-  };
+  }, [createHeaders, handleError, handleSuccess, fetchDashboardStats]);
 
-  // Menu cards configuration (similar to StudentList)
-  const menuCards = [
+  // Clear alert
+  const clearAlert = useCallback(() => {
+    setAlert(null);
+  }, []);
+
+  // Initialize component
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
+
+  // Auto-clear alerts after 5 seconds
+  useEffect(() => {
+    if (alert) {
+      const timer = setTimeout(() => {
+        clearAlert();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert, clearAlert]);
+
+  // Dashboard statistics cards configuration
+  const statisticsCards = [
     {
-      title: 'Staff List',
-      description: 'View complete staff list with basic information and quick actions',
-      icon: <ListIcon sx={{ fontSize: 40 }} />,
-      borderColor: '#1976d2',
-      view: 'list'
+      title: 'Total Staff',
+      value: statsData.totalStaff,
+      icon: <PeopleIcon />,
+      color: '#1976d2',
+      description: 'All staff members'
     },
     {
-      title: 'Edit Staff',
-      description: 'Edit individual staff details or perform bulk updates',
-      icon: <EditIcon sx={{ fontSize: 40 }} />,
-      borderColor: '#2e7d32',
-      view: 'edit'
+      title: 'Teachers',
+      value: statsData.totalTeachers,
+      icon: <SchoolIcon />,
+      color: '#2e7d32',
+      description: 'Teaching staff'
     },
     {
-      title: 'New Staff',
-      description: 'Add new staff members manually or import from file',
-      icon: <PersonAddIcon sx={{ fontSize: 40 }} />,
-      borderColor: '#ed6c02',
-      view: 'new'
+      title: 'Departments',
+      value: statsData.activeDepartments,
+      icon: <BusinessIcon />,
+      color: '#ed6c02',
+      description: 'Active departments'
     },
     {
-      title: 'Staff Documents',
-      description: 'Manage staff documents and credentials',
-      icon: <DocumentIcon sx={{ fontSize: 40 }} />,
-      borderColor: '#9c27b0',
-      view: 'documents'
+      title: 'Pending Requests',
+      value: statsData.pendingRequests,
+      icon: <AssignmentIcon />,
+      color: statsData.pendingRequests > 0 ? '#d32f2f' : '#757575',
+      description: 'Awaiting approval'
     }
   ];
 
-  // Stats cards styled similarly to the StudentList stats cards
-  const renderDashboard = () => (
-    <Grid container spacing={2} sx={{ mb: 4 }}>
-      <Grid item xs={12} sm={3}>
-        <Paper
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            borderRadius: 2,
-            background: 'linear-gradient(135deg, #4e54c8, #8f94fb)',
-            color: '#fff'
-          }}
-          elevation={3}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Total Staff
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 1 }}>
-            {loading ? '...' : statsData.totalStaff}
-          </Typography>
-        </Paper>
+  // Management sections configuration
+  const managementSections = [
+    {
+      title: 'Staff Directory',
+      description: 'View and manage all staff members with advanced filtering and search capabilities',
+      icon: <ViewListIcon />,
+      color: '#1976d2',
+      view: STAFF_VIEWS.LIST,
+      primary: true
+    },
+    {
+      title: 'Edit Staff',
+      description: 'Modify existing staff information and manage individual staff records',
+      icon: <EditIcon />,
+      color: '#2e7d32',
+      view: STAFF_VIEWS.EDIT
+    },
+    {
+      title: 'Add New Staff',
+      description: 'Register new staff members with complete information and documentation',
+      icon: <PersonAddIcon />,
+      color: '#ed6c02',
+      view: STAFF_VIEWS.NEW
+    },
+    {
+      title: 'Documents',
+      description: 'Manage staff documents, certifications, and official records',
+      icon: <DocumentIcon />,
+      color: '#9c27b0',
+      view: STAFF_VIEWS.DOCUMENTS
+    }
+  ];
+
+  // Render statistics dashboard
+  const renderStatisticsDashboard = () => (
+    <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Staff Overview
+        </Typography>
+        <Tooltip title="Refresh Statistics">
+          <IconButton 
+            onClick={fetchDashboardStats} 
+            disabled={statsLoading}
+            size="small"
+          >
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      
+      <Grid container spacing={3}>
+        {statisticsCards.map((card, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card 
+              variant="outlined" 
+              sx={{ 
+                height: 120,
+                borderLeft: `4px solid ${card.color}`,
+                '&:hover': {
+                  boxShadow: 2
+                }
+              }}
+            >
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Box sx={{ color: card.color, mr: 1 }}>
+                    {card.icon}
+                  </Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {card.title}
+                  </Typography>
+                </Box>
+                <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  {statsLoading ? (
+                    <Skeleton width={50} height={40} />
+                  ) : (
+                    card.value
+                  )}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {card.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
-      <Grid item xs={12} sm={3}>
-        <Paper
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            borderRadius: 2,
-            background: 'linear-gradient(135deg, #43cea2, #185a9d)',
-            color: '#fff'
-          }}
-          elevation={3}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Teachers
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 1 }}>
-            {loading ? '...' : statsData.totalTeachers}
-          </Typography>
-        </Paper>
-      </Grid>
-      <Grid item xs={12} sm={3}>
-        <Paper
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            borderRadius: 2,
-            background: 'linear-gradient(135deg, #ff7e5f, #feb47b)',
-            color: '#fff'
-          }}
-          elevation={3}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Departments
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 1 }}>
-            {loading ? '...' : statsData.activeDepartments}
-          </Typography>
-        </Paper>
-      </Grid>
-      <Grid item xs={12} sm={3}>
-        <Paper
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            borderRadius: 2,
-            background: 'linear-gradient(135deg, #f44336, #e57373)',
-            color: '#fff'
-          }}
-          elevation={3}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Requests
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 1 }}>
-            {loading ? '...' : statsData.pendingRequests}
-          </Typography>
-        </Paper>
-      </Grid>
-    </Grid>
+    </Paper>
   );
 
+  // Render management sections
+  const renderManagementSections = () => (
+    <Paper elevation={1} sx={{ p: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+        Staff Management
+      </Typography>
+      <Divider sx={{ mb: 3 }} />
+      
+      <Grid container spacing={3}>
+        {managementSections.map((section) => (
+          <Grid item xs={12} sm={6} md={3} key={section.view}>
+            <Card 
+              variant="outlined"
+              sx={{ 
+                height: 180,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  boxShadow: 3,
+                  transform: 'translateY(-2px)'
+                }
+              }}
+              onClick={() => setSelectedView(section.view)}
+            >
+              <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                <Box sx={{ color: section.color, mb: 2 }}>
+                  {React.cloneElement(section.icon, { sx: { fontSize: 36 } })}
+                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                  {section.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {section.description}
+                </Typography>
+                {section.primary && (
+                  <Chip 
+                    label="Primary" 
+                    size="small" 
+                    color="primary" 
+                    variant="outlined"
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Paper>
+  );
+
+  // Render selected view
   const renderSelectedView = () => {
     const viewProps = {
       onBack: () => setSelectedView(null),
@@ -292,13 +424,13 @@ const StaffList = () => {
     };
 
     switch (selectedView) {
-      case 'list':
+      case STAFF_VIEWS.LIST:
         return <StaffTable {...viewProps} />;
-      case 'edit':
+      case STAFF_VIEWS.EDIT:
         return <StaffEdit {...viewProps} />;
-      case 'new':
+      case STAFF_VIEWS.NEW:
         return <StaffNew {...viewProps} />;
-      case 'documents':
+      case STAFF_VIEWS.DOCUMENTS:
         return <StaffDocuments {...viewProps} />;
       default:
         return null;
@@ -306,80 +438,51 @@ const StaffList = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', p: 3 }}>
+    <Box sx={{ p: 3 }}>
+      {/* Alert Messages */}
+      {alert && (
+        <Alert 
+          severity={alert.type} 
+          onClose={clearAlert}
+          sx={{ mb: 3 }}
+        >
+          {alert.message}
+        </Alert>
+      )}
+
       {!selectedView ? (
         <>
-          {renderDashboard()}
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Staff Management
-              </Typography>
-            </Grid>
-            {menuCards.map((card) => (
-              <Grid item xs={12} sm={6} md={3} key={card.view}>
-                <Card
-                  sx={{
-                    height: 220,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    borderLeft: `5px solid ${card.borderColor}`,
-                    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                    '&:hover': {
-                      boxShadow: 6,
-                      transform: 'scale(1.02)'
-                    }
-                  }}
-                >
-                  <CardActionArea onClick={() => setSelectedView(card.view)} sx={{ height: '100%' }}>
-                    <CardContent
-                      sx={{
-                        textAlign: 'center',
-                        p: 3,
-                        backgroundColor: '#fff',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          mb: 2,
-                          color: card.borderColor
-                        }}
-                      >
-                        {card.icon}
-                      </Box>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }} gutterBottom>
-                        {card.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontSize: '0.9rem', color: '#666' }}>
-                        {card.description}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                  <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
-                    <Button
-                      variant="contained"
-                      onClick={() => setSelectedView(card.view)}
-                      sx={{ backgroundColor: card.borderColor }}
-                    >
-                      Open
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+          {/* Page Title */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+              Staff Management System
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Comprehensive staff management and administration portal
+            </Typography>
+          </Box>
+
+          {/* Statistics Dashboard */}
+          {renderStatisticsDashboard()}
+
+          {/* Management Sections */}
+          {renderManagementSections()}
         </>
       ) : (
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <Button variant="outlined" onClick={() => setSelectedView(null)} sx={{ mb: 2 }}>
-            Back to Dashboard
-          </Button>
+        <Paper elevation={1} sx={{ p: 3 }}>
+          <Box sx={{ mb: 3 }}>
+            <Button 
+              variant="outlined" 
+              onClick={() => setSelectedView(null)}
+              sx={{ mb: 2 }}
+            >
+              ← Back to Dashboard
+            </Button>
+            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+              {managementSections.find(s => s.view === selectedView)?.title}
+            </Typography>
+          </Box>
+          <Divider sx={{ mb: 3 }} />
           {renderSelectedView()}
         </Paper>
       )}
@@ -387,4 +490,4 @@ const StaffList = () => {
   );
 };
 
-export default StaffList;
+export default StaffManagement;
