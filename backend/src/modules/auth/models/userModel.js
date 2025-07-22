@@ -47,15 +47,16 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
     if (this.isModified('password')) {
         const bcrypt = require('bcryptjs');
-        this.password = await bcrypt.hash(this.password, 10);
+
+        // ✅ Check if password is already a bcrypt hash
+        if (!this.password.startsWith('$2')) {
+            this.password = await bcrypt.hash(this.password, 10);
+        }
     }
     next();
 });
 
 // Create models only once
-const models = {
-    User: mongoose.models.User || mongoose.model('User', userSchema),
-    // Add other models here as needed
-};
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);
 
-module.exports = models;
+
