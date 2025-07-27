@@ -29,7 +29,7 @@ import Classes from './components/admin/Academic/Classes';
 import Sections from './components/admin/Academic/Sections';
 import Subjects from './components/admin/Academic/Subjects';
 import Syllabus from './components/admin/Academic/Syllabus';
-import AdminTimetable from './components/admin/Academic/TImetable';
+import AdminTimetable from './components/admin/Academic/Timetable';
 import Grades from './components/admin/Exams/Grades';
 import Marks from './components/admin/Exams/Marks';
 import Results from './components/admin/Exams/Results';
