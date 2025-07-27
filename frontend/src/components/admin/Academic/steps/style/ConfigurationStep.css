@@ -1,0 +1,467 @@
+/* General Step Container Styling */
+.step-container {
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin: 20px auto;
+    max-width: 900px;
+    color: #333;
+}
+
+.step-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 20px;
+}
+
+.step-header h2 {
+    color: #2c3e50;
+    font-size: 2em;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.step-header p {
+    color: #6c757d;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+/* Section Styling */
+.config-section {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    position: relative; /* Ensure proper positioning context */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #e9ecef;
+    position: relative; /* Ensure proper positioning context */
+    width: 100%; /* Ensure full width */
+}
+
+.section-header h3 {
+    color: #34495e;
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Toggle Button in Section Header */
+.section-header .toggle-button {
+    background-color: #2e95f0;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+    margin: 0;
+    margin-top: -50px; /* Nudge button up slightly */
+    margin-right: 20px;
+    position: relative; /* Ensure button stays in normal flow */
+    flex-shrink: 0; /* Prevent button from shrinking */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.section-header .toggle-button:hover {
+    background-color: #5a6268;
+}
+
+/* Day Selection */
+.selection-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.select-all-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.select-all-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.selection-count {
+    background-color: #e9ecef;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    color: #495057;
+    font-weight: 500;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.day-card {
+    background-color: #f0f3f6;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.day-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.day-card.selected {
+    background-color: #e6f2ff;
+    border-color: #007bff;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+}
+
+.day-checkbox {
+    margin-bottom: 10px;
+}
+
+.day-checkbox input[type="checkbox"] {
+    transform: scale(1.4);
+    accent-color: #007bff;
+    cursor: pointer;
+}
+
+.day-content h4 {
+    margin: 5px 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.day-content p {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* Time Configuration */
+.time-config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.config-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.config-item label {
+    font-size: 0.95em;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.time-input,
+.number-input,
+.break-config input[type="text"],
+.break-config select {
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1em;
+    color: #495057;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%; /* Ensure inputs take full width */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.time-input:focus,
+.number-input:focus,
+.break-config input[type="text"]:focus,
+.break-config select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.calculated-time {
+    background-color: #e9ecef;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: center;
+    min-height: 42px; /* Match input height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Break Configuration */
+.toggle-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+    background-color: #5a6268;
+}
+
+.break-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.break-item {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 15px;
+    align-items: flex-end; /* Align inputs to the bottom */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.break-inputs {
+    display: flex;
+    flex-grow: 1; /* Allow inputs to take available space */
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.break-inputs .input-group {
+    flex: 1; /* Distribute space evenly among input groups */
+    min-width: 150px; /* Minimum width for each input group */
+    display: flex;
+    flex-direction: column;
+}
+
+.break-inputs .input-group label {
+    font-size: 0.85em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.remove-break-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.3s ease;
+    align-self: center; /* Center vertically with inputs */
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+.remove-break-button:hover {
+    background-color: #c82333;
+}
+
+.add-break-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+    width: fit-content; /* Only take content width */
+    display: block; /* Center if needed with margin: auto */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.add-break-button:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* Time Slots Preview */
+.time-slots-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.time-slot {
+    background-color: #f0f7ff;
+    border: 1px solid #cce5ff;
+    border-left: 5px solid #007bff;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.time-slot:hover {
+    transform: translateY(-3px);
+}
+
+.time-slot.break-slot {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    border-left-color: #ffc107;
+}
+
+.slot-period {
+    font-weight: 700;
+    color: #34495e;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.slot-time {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.slot-duration {
+    font-size: 0.85em;
+    color: #777;
+    font-style: italic;
+}
+
+/* Configuration Summary */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    background-color: #f7f7f7;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.summary-label {
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.95em;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1em;
+}
+
+.selected-days h4 {
+    color: #34495e;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.selected-tag {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .step-container {
+        padding: 20px;
+        margin: 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .selection-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .select-all-button {
+        width: 100%;
+    }
+
+    .time-config-grid,
+    .summary-grid,
+    .time-slots-preview {
+        grid-template-columns: 1fr;
+    }
+
+    .break-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .break-inputs {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .remove-break-button {
+        width: 100%;
+    }
+}

@@ -155,21 +155,40 @@ exports.getTeachersBySubject = catchAsync(async (req, res) => {
     }
 
     try {
+        // Find the subject document to get its ObjectId
+        const Subject = require('../../academic/models/subjectModel');
+        const subjectDoc = await Subject.findOne({ name: subject });
+        const subjectId = subjectDoc ? subjectDoc._id : null;
+
         // Modified query to be more flexible
         const teachers = await Staff.find({
             roles: { $in: ['Teacher'] },
             isActive: true,
             $or: [
-                { 'teachingAssignments.subject.name': subject },
-                { 'subjectTeacherFor.subject.name': subject },
+                { 'teachingAssignments.subject': subjectId },
+                { 'subjects': subjectId },
+                { 'subjects': subject }, // fallback if stored as name
+                { 'specialization': subject },
+                { 'specialization': { $regex: new RegExp('^' + subject + '$', 'i') } }, // case-insensitive
                 { department: subject }
             ]
         })
-        .select('_id name department designation teachingAssignments')
+        .select('_id name department designation teachingAssignments subjects specialization')
         .lean();
 
         if (!teachers || teachers.length === 0) {
             return res.json(ApiResponse.success('No teachers found for this subject', []));
+        }
+
+        // Populate subject names if subjects are ObjectIds
+        let subjectIdToName = {};
+        if (teachers.some(t => Array.isArray(t.subjects) && t.subjects.some(s => typeof s !== 'string'))) {
+            const Subject = require('../../academic/models/subjectModel');
+            const allSubjectIds = Array.from(new Set(
+                teachers.flatMap(t => (t.subjects || []).filter(s => typeof s !== 'string'))
+            ));
+            const subjectDocs = await Subject.find({ _id: { $in: allSubjectIds } }).select('name _id').lean();
+            subjectIdToName = Object.fromEntries(subjectDocs.map(s => [s._id.toString(), s.name]));
         }
 
         // Map the response to match frontend expectations
@@ -177,7 +196,11 @@ exports.getTeachersBySubject = catchAsync(async (req, res) => {
             _id: teacher._id,
             name: teacher.name,
             department: teacher.department || subject,
-            designation: teacher.designation || 'Teacher'
+            designation: teacher.designation || 'Teacher',
+            subjects: (teacher.subjects || []).map(s =>
+                typeof s === 'string' ? s : (subjectIdToName[s.toString()] || s.toString())
+            ).filter(Boolean),
+            specialization: teacher.specialization || []
         }));
 
         res.json(ApiResponse.success('Teachers retrieved successfully', mappedTeachers));
